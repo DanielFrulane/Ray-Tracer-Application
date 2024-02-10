@@ -17,6 +17,7 @@ namespace App {
         Ray();
         Ray(const Vector3d &mPoint1, const Vector3d &mPoint2, const Vector3d &mOrientation);
         Ray(const Vector3d &point1, const Vector3d &point2);
+        Ray(const Ray &copyRay);
 
         Vector3d getPoint1() const;
         Vector3d getPoint2() const;

@@ -4,6 +4,9 @@
 #include <vector>
 #include <string>
 #include "../include/SDL2/SDL.h"
+#include "../include/Eigen/Eigen"
+
+using namespace Eigen;
 
 namespace App {
     // image class to be rendered
@@ -14,12 +17,14 @@ namespace App {
         std::vector<std::vector<double>> m_greenChannel;
         std::vector<std::vector<double>> m_blueChannel;
         int m_widthSize, m_heightSize, m_depthSize;
+        double m_maxRed, m_maxGreen, m_maxBlue, m_maxOverall;
 
     public:
         RTImage();
         ~RTImage();
         void initialize(const int widthSize, const int heightSize, const int depthtSize, SDL_Renderer *pRenderer);
         void setPixel(const int x, const int y, const double red, const double green, const double blue);
+        void setPixel(const int x, const int y, const Vector3d rgb);
         void display();
 
         int getHeightSize() const;
@@ -30,6 +35,7 @@ namespace App {
         void initializeTexture();
         SDL_Renderer *m_pRenderer{};
         SDL_Texture *m_pTexture;
+        void calculateMaximumValues();
     };
 }
 

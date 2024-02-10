@@ -61,8 +61,13 @@ void App::RTImage::setPixel(const int x, const int y, const double red, const do
     m_blueChannel.at(x).at(y) = blue;
 }
 
+void App::RTImage::setPixel(const int x, const int y, const Vector3d rgb) {
+    App::RTImage::setPixel(x, y, rgb(0), rgb(1), rgb(2));
+}
+
 // generation of what is going to be shown
 void App::RTImage::display(){
+    calculateMaximumValues();
     // allocates and clears memory for a pixel buffer that will go into SDL texture.
     Uint32 *tempPixels = new Uint32[m_widthSize * m_heightSize];
     memset(tempPixels, 0, m_widthSize * m_heightSize * sizeof(Uint32));
@@ -90,9 +95,10 @@ void App::RTImage::display(){
 
 // converts color to Uint32 from char conversion
 Uint32 App::RTImage::convertColorFrom(const double red, const double green, const double blue){
-    unsigned char r = static_cast<unsigned char>(red);
-    unsigned char g = static_cast<unsigned char>(green);
-    unsigned char b = static_cast<unsigned char>(blue);
+    // convert colors to correct range and cast colors to chars
+    unsigned char r = static_cast<unsigned char>((red / m_maxOverall) * 255.0);
+    unsigned char g = static_cast<unsigned char>((green / m_maxOverall) * 255.0);
+    unsigned char b = static_cast<unsigned char>((blue / m_maxOverall) * 255.0);
 
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN // from SDL documentation
     Uint32 pixelColor = (b << 24) + (g << 16) + (r << 8) + 255;
@@ -109,4 +115,36 @@ int App::RTImage::getHeightSize() const {
 
 int App::RTImage::getWidthSize() const {
     return m_widthSize;
+}
+
+void App::RTImage::calculateMaximumValues() {
+    m_maxRed = 0.0;
+    m_maxGreen = 0.0;
+    m_maxBlue = 0.0;
+    m_maxOverall = 0.0;
+    for (int x = 0; x < m_widthSize; ++x) {
+        for (int y = 0; y < m_heightSize; ++y) {
+            double red = m_redChannel.at(x).at(y);
+            double green = m_greenChannel.at(x).at(y);
+            double blue = m_blueChannel.at(x).at(y);
+            if(red > m_maxRed){
+                m_maxRed = red;
+            }
+            if(green > m_maxGreen){
+                m_maxGreen = green;
+            }
+            if(blue > m_maxBlue){
+                m_maxBlue = blue;
+            }
+        }
+    }
+    if(m_maxRed > m_maxOverall){
+        m_maxOverall = m_maxRed;
+    }
+    if(m_maxGreen > m_maxOverall){
+        m_maxOverall = m_maxGreen;
+    }
+    if(m_maxBlue > m_maxOverall){
+        m_maxOverall = m_maxBlue;
+    }
 }

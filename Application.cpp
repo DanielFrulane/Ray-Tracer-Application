@@ -40,7 +40,7 @@ int Application::inExecution(){
     if (!inInitialization()){ // initialization successful
         return -1;
     }
-    std::cout<<"Initialized\n";
+    std::cout<<"Done\n";
     while (isRunning){
         while(SDL_PollEvent(&event) != 0){
             inEvent(&event);

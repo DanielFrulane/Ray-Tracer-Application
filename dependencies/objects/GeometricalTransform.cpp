@@ -1,17 +1,7 @@
 #include "GeometricalTransform.hpp"
 #include <iostream>
 
-void App::GeometricalTransform::printMatrix(const Matrix4d &matrix) {
-    std::cout<<"printing matrix: "<<std::endl<<matrix<<std::endl;
-}
-
-void App::GeometricalTransform::printMatrix(bool isForwardTransformation) {
-    if (isForwardTransformation){
-        printMatrix(m_forwardTransformation);
-    } else {
-        printMatrix(m_backwardTransformation);
-    }
-}
+using namespace Eigen;
 
 App::GeometricalTransform::GeometricalTransform() {
     m_forwardTransformation.setIdentity();
@@ -73,20 +63,19 @@ void App::GeometricalTransform::setTransformation(const Vector3d &translation, c
     rotationZFinal(1,0) = sin(rotation(2));
     rotationZFinal(1,1) = cos(rotation(2));
 
-    scaleFinal(0,0) = rotation(0);
-    scaleFinal(1,1) = rotation(1);
-    scaleFinal(2,2) = rotation(2);
+    scaleFinal(0,0) = scale(0);
+    scaleFinal(1,1) = scale(1);
+    scaleFinal(2,2) = scale(2);
 
-    m_forwardTransformation << translationFinal * scaleFinal * rotationXFinal * rotationYFinal * rotationZFinal;
-    m_backwardTransformation = m_forwardTransformation;
-    m_backwardTransformation.inverse();
+    m_forwardTransformation = translationFinal*rotationXFinal*rotationYFinal*rotationZFinal*scaleFinal;
+    m_backwardTransformation = m_forwardTransformation.inverse();
 }
 
-Matrix4d App::GeometricalTransform::getForward() {
+Matrix4d App::GeometricalTransform::getForward() const {
     return m_forwardTransformation;
 }
 
-Matrix4d App::GeometricalTransform::getBackward() {
+Matrix4d App::GeometricalTransform::getBackward() const {
     return m_backwardTransformation;
 }
 
@@ -95,11 +84,11 @@ App::Ray App::GeometricalTransform::applyTransformation(const Ray &rayInput, boo
     if (isForwardTransformation){
         rayOutput.m_point1 = this->applyTransformation(rayInput.m_point1, App::FORWARD_TRANSFORMATION);
         rayOutput.m_point2 = this->applyTransformation(rayInput.m_point2, App::FORWARD_TRANSFORMATION);
-        rayOutput.updateOrientation();
+        rayOutput.m_orientation = rayOutput.m_point2 - rayOutput.m_point1;
     } else {
         rayOutput.m_point1 = this->applyTransformation(rayInput.m_point1, App::BACKWARD_TRANSFORMATION);
         rayOutput.m_point2 = this->applyTransformation(rayInput.m_point2, App::BACKWARD_TRANSFORMATION);
-        rayOutput.updateOrientation();
+        rayOutput.m_orientation = rayOutput.m_point2 - rayOutput.m_point1;
     }
     return rayOutput;
 }
@@ -121,10 +110,9 @@ Vector3d App::GeometricalTransform::applyTransformation(const Vector3d &vectorIn
 
 namespace App{
     App::GeometricalTransform operator* (const GeometricalTransform& leftHandSide, const GeometricalTransform& rightHandSide){
-        Matrix4d forward = leftHandSide.m_forwardTransformation * rightHandSide.m_forwardTransformation;
+        Matrix4d forward = leftHandSide.getForward() * rightHandSide.getForward();
 
-        Matrix4d& backward = forward;
-        backward.inverse();
+        Matrix4d backward = forward.inverse();
 
         App::GeometricalTransform finalResult (forward, backward);
 
@@ -138,4 +126,18 @@ App::GeometricalTransform App::GeometricalTransform::operator= (const App::Geome
         m_backwardTransformation = rightHandSide.m_backwardTransformation;
     }
     return *this;
+}
+
+
+
+void App::GeometricalTransform::printMatrix(bool isForwardTransformation)
+{
+    if (isForwardTransformation)
+    {
+        std::cout << m_forwardTransformation << std::endl << std::endl;;
+    }
+    else
+    {
+        std::cout << m_backwardTransformation << std::endl << std::endl;;
+    }
 }

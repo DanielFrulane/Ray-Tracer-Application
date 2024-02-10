@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -898,7 +898,7 @@ extern DECLSPEC SDL_AudioSpec *SDLCALL SDL_LoadWAV_RW(SDL_RWops * src,
 extern DECLSPEC void SDLCALL SDL_FreeWAV(Uint8 * audio_buf);
 
 /**
- * initialize an SDL_AudioCVT structure for conversion.
+ * Initialize an SDL_AudioCVT structure for conversion.
  *
  * Before an SDL_AudioCVT structure can be used to convert audio data it must
  * be initialized with source and destination information.

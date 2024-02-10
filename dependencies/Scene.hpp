@@ -5,7 +5,10 @@
 #include "../include/SDL2/SDL.h"
 #include "RTImage.hpp"
 #include "Camera.hpp"
+#include "./materials/MaterialGeneric.hpp"
+#include "./materials/MaterialSimple.hpp"
 #include "./objects/ObjectSphere.hpp"
+#include "./objects/ObjectPlane.hpp"
 #include "./light/LightPoint.hpp"
 #include <memory>
 
@@ -22,6 +25,8 @@ namespace App {
         Scene();
 
         bool render(RTImage &outputImage);
+
+        bool castRay(Ray &castedRay, std::shared_ptr<ObjectGeneric> &closestObject, Vector3d &closestIntersectionPoint, Vector3d &closestLocalNormal, Vector3d &closestLocalColor);
     };
 }
 

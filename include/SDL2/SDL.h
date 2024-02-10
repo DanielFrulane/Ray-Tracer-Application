@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -95,7 +95,7 @@ extern "C" {
 /* @} */
 
 /**
- * initialize the SDL library.
+ * Initialize the SDL library.
  *
  * SDL_Init() simply forwards to calling SDL_InitSubSystem(). Therefore, the
  * two may be used interchangeably. Though for readability of your code

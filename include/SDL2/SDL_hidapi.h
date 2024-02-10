@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -123,7 +123,7 @@ typedef struct SDL_hid_device_info
 
 
 /**
- * initialize the HIDAPI library.
+ * Initialize the HIDAPI library.
  *
  * This function initializes the HIDAPI library. Calling it is not strictly
  * necessary, as it will be called automatically by SDL_hid_enumerate() and

@@ -23,3 +23,9 @@ Vector3d App::Ray::getPoint2() const {
 void App::Ray::updateOrientation() {
     m_orientation = m_point2 - m_point1;
 }
+
+App::Ray::Ray(const App::Ray &copyRay) {
+    this->m_point1 = copyRay.m_point1;
+    this->m_point2 = copyRay.m_point2;
+    this->m_orientation = copyRay.m_orientation;
+}

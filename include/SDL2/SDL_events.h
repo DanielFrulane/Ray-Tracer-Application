@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -88,7 +88,7 @@ typedef enum
     SDL_LOCALECHANGED,  /**< The user's locale preferences have changed. */
 
     /* Display events */
-    SDL_DISPLAYEVENT   = 0x150,  /**< display state change */
+    SDL_DISPLAYEVENT   = 0x150,  /**< Display state change */
 
     /* Window events */
     SDL_WINDOWEVENT    = 0x200, /**< Window state change */
@@ -131,6 +131,8 @@ typedef enum
     SDL_CONTROLLERTOUCHPADMOTION,      /**< Game controller touchpad finger was moved */
     SDL_CONTROLLERTOUCHPADUP,          /**< Game controller touchpad finger was lifted */
     SDL_CONTROLLERSENSORUPDATE,        /**< Game controller sensor was updated */
+    SDL_CONTROLLERUPDATECOMPLETE_RESERVED_FOR_SDL3,
+    SDL_CONTROLLERSTEAMHANDLEUPDATED,  /**< Game controller Steam handle has changed */
 
     /* Touch events */
     SDL_FINGERDOWN      = 0x700,
@@ -186,7 +188,7 @@ typedef struct SDL_CommonEvent
 } SDL_CommonEvent;
 
 /**
- *  \brief display state change event data (event.display.*)
+ *  \brief Display state change event data (event.display.*)
  */
 typedef struct SDL_DisplayEvent
 {
@@ -446,7 +448,7 @@ typedef struct SDL_ControllerButtonEvent
  */
 typedef struct SDL_ControllerDeviceEvent
 {
-    Uint32 type;        /**< ::SDL_CONTROLLERDEVICEADDED, ::SDL_CONTROLLERDEVICEREMOVED, or ::SDL_CONTROLLERDEVICEREMAPPED */
+    Uint32 type;        /**< ::SDL_CONTROLLERDEVICEADDED, ::SDL_CONTROLLERDEVICEREMOVED, ::SDL_CONTROLLERDEVICEREMAPPED, or ::SDL_CONTROLLERSTEAMHANDLEUPDATED */
     Uint32 timestamp;   /**< In milliseconds, populated using SDL_GetTicks() */
     Sint32 which;       /**< The joystick device index for the ADDED event, instance id for the REMOVED or REMAPPED event */
 } SDL_ControllerDeviceEvent;
@@ -581,15 +583,6 @@ typedef struct SDL_QuitEvent
 } SDL_QuitEvent;
 
 /**
- *  \brief OS Specific event
- */
-typedef struct SDL_OSEvent
-{
-    Uint32 type;        /**< ::SDL_QUIT */
-    Uint32 timestamp;   /**< In milliseconds, populated using SDL_GetTicks() */
-} SDL_OSEvent;
-
-/**
  *  \brief A user-defined event type (event.user.*)
  */
 typedef struct SDL_UserEvent
@@ -626,7 +619,7 @@ typedef union SDL_Event
 {
     Uint32 type;                            /**< Event type, shared with all events */
     SDL_CommonEvent common;                 /**< Common event data */
-    SDL_DisplayEvent display;               /**< display event data */
+    SDL_DisplayEvent display;               /**< Display event data */
     SDL_WindowEvent window;                 /**< Window event data */
     SDL_KeyboardEvent key;                  /**< Keyboard event data */
     SDL_TextEditingEvent edit;              /**< Text editing event data */

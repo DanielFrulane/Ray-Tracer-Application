@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -26,7 +26,7 @@
  *         devices.
  *
  *  The basic usage is as follows:
- *   - initialize the subsystem (::SDL_INIT_HAPTIC).
+ *   - Initialize the subsystem (::SDL_INIT_HAPTIC).
  *   - Open a haptic device.
  *    - SDL_HapticOpen() to open from index.
  *    - SDL_HapticOpenFromJoystick() to open from an existing joystick.
@@ -45,7 +45,7 @@
  *    if (haptic == NULL)
  *       return -1;
  *
- *    // initialize simple rumble
+ *    // Initialize simple rumble
  *    if (SDL_HapticRumbleInit( haptic ) != 0)
  *       return -1;
  *
@@ -1283,7 +1283,7 @@ extern DECLSPEC int SDLCALL SDL_HapticStopAll(SDL_Haptic * haptic);
 extern DECLSPEC int SDLCALL SDL_HapticRumbleSupported(SDL_Haptic * haptic);
 
 /**
- * initialize a haptic device for simple rumble playback.
+ * Initialize a haptic device for simple rumble playback.
  *
  * \param haptic the haptic device to initialize for simple rumble playback
  * \returns 0 on success or a negative error code on failure; call

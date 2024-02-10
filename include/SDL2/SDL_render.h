@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -42,7 +42,7 @@
  *  of the many good 3D engines.
  *
  *  These functions must be called from the main thread.
- *  See this bug for details: http://bugzilla.libsdl.org/show_bug.cgi?id=1995
+ *  See this bug for details: https://github.com/libsdl-org/SDL/issues/986
  */
 
 #ifndef SDL_render_h_
@@ -1622,7 +1622,7 @@ extern DECLSPEC int SDLCALL SDL_RenderCopyExF(SDL_Renderer * renderer,
                                             const SDL_RendererFlip flip);
 
 /**
- * render a list of triangles, optionally using a texture and indices into the
+ * Render a list of triangles, optionally using a texture and indices into the
  * vertex array Color and alpha modulation is done per vertex
  * (SDL_SetTextureColorMod and SDL_SetTextureAlphaMod are ignored).
  *
@@ -1647,7 +1647,7 @@ extern DECLSPEC int SDLCALL SDL_RenderGeometry(SDL_Renderer *renderer,
                                                const int *indices, int num_indices);
 
 /**
- * render a list of triangles, optionally using a texture and indices into the
+ * Render a list of triangles, optionally using a texture and indices into the
  * vertex arrays Color and alpha modulation is done per vertex
  * (SDL_SetTextureColorMod and SDL_SetTextureAlphaMod are ignored).
  *

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -185,14 +185,14 @@ typedef enum
 typedef enum
 {
     SDL_DISPLAYEVENT_NONE,          /**< Never used */
-    SDL_DISPLAYEVENT_ORIENTATION,   /**< display orientation has changed to data1 */
-    SDL_DISPLAYEVENT_CONNECTED,     /**< display has been added to the system */
-    SDL_DISPLAYEVENT_DISCONNECTED,  /**< display has been removed from the system */
-    SDL_DISPLAYEVENT_MOVED          /**< display has changed position */
+    SDL_DISPLAYEVENT_ORIENTATION,   /**< Display orientation has changed to data1 */
+    SDL_DISPLAYEVENT_CONNECTED,     /**< Display has been added to the system */
+    SDL_DISPLAYEVENT_DISCONNECTED,  /**< Display has been removed from the system */
+    SDL_DISPLAYEVENT_MOVED          /**< Display has changed position */
 } SDL_DisplayEventID;
 
 /**
- *  \brief display orientation
+ *  \brief Display orientation
  */
 typedef enum
 {
@@ -310,7 +310,7 @@ extern DECLSPEC int SDLCALL SDL_GetNumVideoDrivers(void);
 extern DECLSPEC const char *SDLCALL SDL_GetVideoDriver(int index);
 
 /**
- * initialize the video subsystem, optionally specifying a video driver.
+ * Initialize the video subsystem, optionally specifying a video driver.
  *
  * This function initializes the video subsystem, setting up a connection to
  * the window manager, etc, and determines the available display modes and
@@ -1278,7 +1278,8 @@ extern DECLSPEC int SDLCALL SDL_SetWindowFullscreen(SDL_Window * window,
 /**
  * Return whether the window has a surface associated with it.
  *
- * \returns SDL_TRUE if there is a surface associated with the window, or SDL_FALSE otherwise.
+ * \returns SDL_TRUE if there is a surface associated with the window, or
+ *          SDL_FALSE otherwise.
  *
  * \since This function is available since SDL 2.28.0.
  *
@@ -1339,6 +1340,11 @@ extern DECLSPEC int SDLCALL SDL_UpdateWindowSurface(SDL_Window * window);
  * on the screen.
  *
  * This function is equivalent to the SDL 1.2 API SDL_UpdateRects().
+ *
+ * Note that this function will update _at least_ the rectangles specified,
+ * but this is only intended as an optimization; in practice, this might
+ * update more of the screen (or all of the screen!), depending on what
+ * method SDL uses to send pixels to the system.
  *
  * \param window the window to update
  * \param rects an array of SDL_Rect structures representing areas of the

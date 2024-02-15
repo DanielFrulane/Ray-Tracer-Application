@@ -6,6 +6,7 @@
 #include "dependencies/Scene.hpp"
 #include "dependencies/Camera.hpp"
 
+
 class Application{
 private:
     bool isRunning;

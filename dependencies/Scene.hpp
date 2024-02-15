@@ -7,9 +7,17 @@
 #include "Camera.hpp"
 #include "./materials/MaterialGeneric.hpp"
 #include "./materials/MaterialSimple.hpp"
+#include "./materials/MaterialRefractiveSimple.hpp"
 #include "./objects/ObjectSphere.hpp"
 #include "./objects/ObjectPlane.hpp"
+#include "./objects/ObjectCylinder.hpp"
+#include "./objects/ObjectCone.hpp"
+#include "./objects/ObjectCuboid.hpp"
+#include "./objects/ObjectComposition.hpp"
 #include "./light/LightPoint.hpp"
+#include "./textures/TextureFlat.hpp"
+#include "./textures/TextureChecker.hpp"
+#include "./textures/TextureGradient.hpp"
 #include <memory>
 
 namespace App {

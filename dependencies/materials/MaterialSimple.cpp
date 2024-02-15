@@ -1,6 +1,6 @@
 #include "MaterialSimple.hpp"
 
-App::MaterialSimple::MaterialSimple() {
+App::MaterialSimple::MaterialSimple() { // TODO MERGE 2 MATERIALS
     m_maximumNumberOfReflections = 3;
     m_currentNumberOfReflections = 0;
 }
@@ -19,7 +19,12 @@ Vector3d App::MaterialSimple::calculateColor(const std::vector<std::shared_ptr<O
     Vector3d diffuseColor={0.0,0.0,0.0};;
     Vector3d specularColor={0.0,0.0,0.0};;
 
-    diffuseColor = calculateDiffuseColor(objectList, lightList, currentObject, intersectionPoint, localNormal, m_color);
+    if(m_hasTexture){
+        diffuseColor = calculateDiffuseColor(objectList, lightList, currentObject, intersectionPoint, localNormal,
+                                             m_textures.at(0)->getColor(currentObject->m_uvCoordinates));
+    } else {
+        diffuseColor = calculateDiffuseColor(objectList, lightList, currentObject, intersectionPoint, localNormal, m_color);
+    }
 
     if (m_reflectivity > 0.0){
         reflectionColor = calculateReflectionColor(objectList, lightList, currentObject, intersectionPoint, localNormal, cameraRay);

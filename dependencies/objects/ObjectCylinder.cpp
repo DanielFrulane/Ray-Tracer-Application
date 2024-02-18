@@ -6,15 +6,14 @@ App::ObjectCylinder::ObjectCylinder() {
     m_boundingBoxTransformation.setTransformation({ 0.0, 0.0, 0.0 },
                                                   { 0.0, 0.0, 0.0 },
                                                   { 1.0, 1.0, 1.0 });
-
+    m_uvMapType = uvCYLINDER;
 }
 
 App::ObjectCylinder::~ObjectCylinder() {
 
 }
 
-bool App::ObjectCylinder::isIntersecting(const App::Ray &rayCasted, Vector3d &intersectionPoint, Vector3d &localNormal,
-                                         Vector3d &localColor) {
+bool App::ObjectCylinder::isIntersecting(const App::Ray &rayCasted, HitInformation &hitInformation) {
     Ray backwardRay = m_transformation.applyTransformation(rayCasted, BACKWARD_TRANSFORMATION);
 
     Vector3d vec = backwardRay.m_orientation;
@@ -109,7 +108,7 @@ bool App::ObjectCylinder::isIntersecting(const App::Ray &rayCasted, Vector3d &in
     Vector3d validPointOfIntersection = pointsOfIntersection.at(minIndex);
     if (minIndex < 2){
         // Transform the intersection point back into world coordinates.
-        intersectionPoint = m_transformation.applyTransformation(validPointOfIntersection, FORWARD_TRANSFORMATION);
+        hitInformation.pointOfIntersection = m_transformation.applyTransformation(validPointOfIntersection, FORWARD_TRANSFORMATION);
 
         // Compute the local normal.
         Vector3d originalNormal = {0.0,0.0,0.0};
@@ -118,13 +117,14 @@ bool App::ObjectCylinder::isIntersecting(const App::Ray &rayCasted, Vector3d &in
         Vector3d globalOrigin = m_transformation.applyTransformation(localOrigin, FORWARD_TRANSFORMATION);
         originalNormal = validPointOfIntersection;
         originalNormal(2) = 0.0; // circle cross-section of infinite cylinder
-        localNormal = m_transformation.applyNorm(originalNormal);
-        localNormal.normalize();
+        hitInformation.normal = m_transformation.applyNorm(originalNormal);
+        hitInformation.normal.normalize();
 
         //newNormal = m_transformation.applyTransformation(originalNormal, FORWARD_TRANSFORMATION) - globalOrigin;
         //newNormal.normalize();
         //localNormal = newNormal;
-        localColor = m_color;
+        hitInformation.color = m_color;
+        hitInformation.hitObject = this -> shared_from_this();
 
         double x = validPointOfIntersection(0);
         double y = validPointOfIntersection(1);
@@ -141,21 +141,22 @@ bool App::ObjectCylinder::isIntersecting(const App::Ray &rayCasted, Vector3d &in
             // Check if we are inside the disk.
             if (sqrt(pow(validPointOfIntersection(0), 2.0) + pow(validPointOfIntersection(1), 2.0)) < 1.0) {
                 // Transform the intersection point back into world coordinates.
-                intersectionPoint = m_transformation.applyTransformation(validPointOfIntersection, FORWARD_TRANSFORMATION);
+                hitInformation.pointOfIntersection = m_transformation.applyTransformation(validPointOfIntersection, FORWARD_TRANSFORMATION);
 
                 // Compute the local normal.
                 Vector3d localOrigin = {0.0, 0.0, 0.0};
                 Vector3d normalVector  = {0.0, 0.0, 0.0 + validPointOfIntersection(2)};
                 Vector3d globalOrigin = m_transformation.applyTransformation(localOrigin, FORWARD_TRANSFORMATION);
-                localNormal = m_transformation.applyTransformation(normalVector, FORWARD_TRANSFORMATION) - globalOrigin;
-                localNormal.normalize();
+                hitInformation.normal = m_transformation.applyTransformation(normalVector, FORWARD_TRANSFORMATION) - globalOrigin;
+                hitInformation.normal.normalize();
 
                 //Vector3d normalVector  = {0.0, 0.0, validPointOfIntersection(2)};
                 //localNormal = m_transformation.applyNorm(normalVector);
                 //localNormal.normalize();
 
                 // Return the base color.
-                localColor = m_color;
+                hitInformation.color = m_color;
+                hitInformation.hitObject = this -> shared_from_this();
 
                 double x = validPointOfIntersection(0);
                 double y = validPointOfIntersection(1);

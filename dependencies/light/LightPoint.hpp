@@ -2,6 +2,7 @@
 #define RAY_TRACER_APPLICATION_LIGHTPOINT_HPP
 
 #include "LightSource.hpp"
+#include "../HitInformation.hpp"
 #include "../objects/ObjectGeneric.hpp"
 
 namespace App {

@@ -7,14 +7,14 @@ App::ObjectCuboid::ObjectCuboid() {
     m_boundingBoxTransformation.setTransformation({ 0.0, 0.0, 0.0 },
                                                   { 0.0, 0.0, 0.0 },
                                                   { 1.0, 1.0, 1.0 });
+    m_uvMapType = uvCUBOID;
 }
 
 App::ObjectCuboid::~ObjectCuboid() {
 
 }
 
-bool App::ObjectCuboid::isIntersecting(const App::Ray &rayCasted, Vector3d &intersectionPoint, Vector3d &localNormal,
-                                       Vector3d &localColor) {
+bool App::ObjectCuboid::isIntersecting(const App::Ray &rayCasted, HitInformation &hitInformation) {
     if (!m_isVisible){
         return false;
     }
@@ -141,20 +141,23 @@ bool App::ObjectCuboid::isIntersecting(const App::Ray &rayCasted, Vector3d &inte
         }
 
         // Transform the intersection point back into world coordinates.
-        intersectionPoint = m_transformation.applyTransformation(pointOfIntersection, FORWARD_TRANSFORMATION);
+        hitInformation.pointOfIntersection = m_transformation.applyTransformation(pointOfIntersection, FORWARD_TRANSFORMATION);
 
         // Transform the normal vector.
         //Vector3d originOfObject(0.0,0.0,0.0);
         //Vector3d  newOriginOfObject = m_transformation.applyTransformation(originOfObject, FORWARD_TRANSFORMATION);
         //localNormal = intersectionPoint - newOriginOfObject;
-        localNormal = m_transformation.applyNorm(normalVector);
-
-        localNormal.normalize();
+        hitInformation.normal = m_transformation.applyNorm(normalVector);
+        hitInformation.normal.normalize();
 
         // Return the base color.
-        localColor = m_color;
+        hitInformation.color = m_color;
 
-        m_uvCoordinates = {finalU, finalV};
+        calculateUVSpace(pointOfIntersection,m_uvCoordinates);
+        hitInformation.uvCoordinates = m_uvCoordinates;
+        hitInformation.hitObject = this->shared_from_this();
+
+        //m_uvCoordinates = {finalU, finalV};
 
         return true;
     }
@@ -224,10 +227,8 @@ bool App::ObjectCuboid::isIntersecting(const App::Ray &castRay){
         to know which face of the box was actually involved. */
     bool validIntersection = false;
     int i = 0;
-    while ((i < 6) && (!validIntersection))
-    {
-        if ((t[i] < 100e6) && (t[i] > 0.0) && (abs(u[i]) <= 1.0) && (abs(v[i]) <= 1.0))
-        {
+    while ((i < 6) && (!validIntersection)){
+        if ((t[i] < 100e6) && (t[i] > 0.0) && (abs(u[i]) <= 1.0) && (abs(v[i]) <= 1.0)){
             validIntersection = true;
         }
 

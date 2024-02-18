@@ -35,6 +35,7 @@ App::Scene::Scene(double aspectRatio) {
     floorTexture->setTransformation({0.0,0.0},M_PI/4,{16.0,16.0});
     floorMaterial->setTexture(floorTexture);
 
+
     std::shared_ptr<MaterialSimple> gradMat = std::make_shared<MaterialSimple> (MaterialSimple());
     gradMat -> m_color = {0.5, 0.3, 0.3}; // TODO ALL IN MATERIAL
     gradMat -> m_reflectivity = 0.05;
@@ -68,8 +69,9 @@ App::Scene::Scene(double aspectRatio) {
     testMatrixPlane.setTransformation({0.0, 0.0, 2.0},{0.0, 0.0, 0.0},{16.0, 16.0, 16.0});
     m_objectsInScene.at(0) -> setTransformation(testMatrixPlane);
     m_objectsInScene.at(0) ->setMaterial(floorMaterial);
+    m_objectsInScene.at(0) ->m_uvMapType = uvPLANE; // TODO use?
 
-    m_objectsInScene.push_back(std::make_shared<ObjectCylinder>(ObjectCylinder()));
+    /*m_objectsInScene.push_back(std::make_shared<ObjectCylinder>(ObjectCylinder()));
     m_objectsInScene.at(1) -> m_color << 0.25, 0.5, 0.8;
     GeometricalTransformation testMatrix1;
     testMatrix1.setTransformation({0.0, 0.0, -3.0},{M_PI/4, M_PI/4, M_PI/4},{1.0, 1.0, 1.0});
@@ -95,16 +97,23 @@ App::Scene::Scene(double aspectRatio) {
     GeometricalTransformation testMatrix4;
     testMatrix4.setTransformation({2.0, -6.0, -2.0},{0.0, 0.0, 0.0},{1.0, 1.0, 1.0});
     m_objectsInScene.at(4) -> setTransformation(testMatrix4);
-    m_objectsInScene.at(4) ->setMaterial(glass);
+    m_objectsInScene.at(4) ->setMaterial(glass);*/
 
-    /*std::shared_ptr<ObjectSphere> mySphere = std::make_shared<ObjectSphere>(ObjectSphere());
+    std::shared_ptr<ObjectSphere> mySphere = std::make_shared<ObjectSphere>(ObjectSphere());
     mySphere->setMaterial(whiteDiffuse);
+    std::shared_ptr<ObjectSphere> mySphere2 = std::make_shared<ObjectSphere>(ObjectSphere());
+    mySphere2->setMaterial(whiteDiffuse);
     std::shared_ptr<ObjectComposition> composite = std::make_shared<ObjectComposition> (ObjectComposition());
-    composite -> addObject(mySphere);
-    GeometricalTransformation testMatrix5;
-    testMatrix5.setTransformation({2.0, -6.0, -2.0},{0.0, 0.0, 0.0},{1.0, 1.0, 1.0});
+    GeometricalTransformation testMatrix5, testMatrix6, testMatrix7;
+    testMatrix5.setTransformation({-2.0, -2.0, -2.0},{0.0, 0.0, 0.0},{4.0, 4.0, 4.0});
+    testMatrix6.setTransformation({0.0, 0.0, 0.0},{0.0, 0.0, 0.0},{0.5, 0.5, 0.5});
+    testMatrix7.setTransformation({5.0, 0.0, 0.0},{0.0, 0.0, 0.0},{1.0, 1.0, 1.0});
     composite -> setTransformation(testMatrix5);
-    m_objectsInScene.push_back(composite);*/
+    mySphere -> setTransformation(testMatrix6);
+    mySphere2 -> setTransformation(testMatrix7);
+    composite -> addObject(mySphere);
+    composite -> addObject(mySphere2);
+    m_objectsInScene.push_back(composite);
 
     m_lightsInScene.push_back(std::make_shared<LightPoint>(LightPoint()));
     m_lightsInScene.at(0) -> m_location << 5.0,-10.0,-5.0;
@@ -119,6 +128,7 @@ App::Scene::Scene(double aspectRatio) {
     m_lightsInScene.at(2) -> m_color << 1.0,1.0,0.0;
 
     std::cout<<"Objects in scene: "<<m_objectsInScene.size()<<std::endl;
+    std::cout<<"Objects in composite: "<<composite->m_objects.size()<<std::endl;
     std::cout<<"Lights in scene: "<<m_lightsInScene.size()<<std::endl;
 }
 
@@ -141,20 +151,21 @@ bool App::Scene::render(RTImage &outputImage) {
             m_camera.generateRay(normX, normY, cameraRay);
 
             std::shared_ptr<ObjectGeneric> closestObject;
-            Vector3d closestIntersectionPoint;
-            Vector3d closestLocalNormal;
-            Vector3d closestLocalColor;
-            bool intersectionFound = castRay(cameraRay, closestObject, closestIntersectionPoint, closestLocalNormal, closestLocalColor);
+            //Vector3d closestIntersectionPoint;
+            //Vector3d closestLocalNormal;
+            //Vector3d closestLocalColor;
+            HitInformation hitInformation;
+            bool intersectionFound = castRay(cameraRay, closestObject, hitInformation);
 
             if (intersectionFound){
-                if (closestObject->m_hasMaterial){
+                if (hitInformation.hitObject->m_hasMaterial){
                     // color from material
                     MaterialGeneric::m_currentNumberOfReflections = 0;
-                    Vector3d color = closestObject->m_material->calculateColor(m_objectsInScene, m_lightsInScene, closestObject, closestIntersectionPoint, closestLocalNormal, cameraRay);
+                    Vector3d color = hitInformation.hitObject->m_material->calculateColor(m_objectsInScene, m_lightsInScene, hitInformation.hitObject, hitInformation.pointOfIntersection, hitInformation.normal, cameraRay);
                     outputImage.setPixel(x,y,color);
                 } else {
                     // basic color calculation
-                    Vector3d color = MaterialGeneric::calculateDiffuseColor(m_objectsInScene, m_lightsInScene, closestObject, closestIntersectionPoint, closestLocalNormal, closestObject->m_color);
+                    Vector3d color = MaterialGeneric::calculateDiffuseColor(m_objectsInScene, m_lightsInScene, hitInformation.hitObject, hitInformation.pointOfIntersection, hitInformation.normal, closestObject->m_color);
                     outputImage.setPixel(x,y,color);
                 }
             }
@@ -164,26 +175,24 @@ bool App::Scene::render(RTImage &outputImage) {
 }
 
 bool App::Scene::castRay(App::Ray &castedRay, std::shared_ptr<ObjectGeneric> &closestObject,
-                         Vector3d &closestIntersectionPoint, Vector3d &closestLocalNormal,
-                         Vector3d &closestLocalColor) {
-    Vector3d intersectionPoint;
-    Vector3d localNormal;
-    Vector3d localColor;
+                         HitInformation &closestHitInformation) {
+    //Vector3d intersectionPoint;
+    //Vector3d localNormal;
+    //Vector3d localColor;
+    HitInformation hitInformation;
     double localMinimalDistance = MINIMAL_DISTANCE;
     bool intersectionFound = false;
 
     for (std::shared_ptr<ObjectGeneric> &currentObject: m_objectsInScene) {
-        bool isValidIntersection = currentObject->isIntersecting(castedRay, intersectionPoint, localNormal, localColor);
+        bool isValidIntersection = currentObject->isIntersecting(castedRay, hitInformation);
         if (isValidIntersection){
             intersectionFound = true;
 
-            double distanceFromCameraToIntersection = (intersectionPoint - castedRay.m_point1).norm();
+            double distanceFromCameraToIntersection = (hitInformation.pointOfIntersection - castedRay.m_point1).norm();
             if (distanceFromCameraToIntersection < localMinimalDistance){
                 localMinimalDistance = distanceFromCameraToIntersection;
                 closestObject = currentObject;
-                closestIntersectionPoint = intersectionPoint;
-                closestLocalNormal = localNormal;
-                closestLocalColor = localColor;
+                closestHitInformation = hitInformation;
             }
         }
     }

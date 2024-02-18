@@ -5,12 +5,12 @@
 #include "./GeometricalTransformation.hpp"
 
 namespace App {
-    class ObjectCone : public ObjectGeneric {
+    class ObjectCone : public ObjectGeneric, public std::enable_shared_from_this<ObjectCone> {
     public:
         ObjectCone();
         virtual ~ObjectCone() override;
 
-        virtual bool isIntersecting(const Ray &castedRay, Vector3d &intersectionPoint, Vector3d &localNormal, Vector3d &localColor) override;
+        virtual bool isIntersecting(const Ray &castedRay, HitInformation &hitInformation) override;
     };
 }
 

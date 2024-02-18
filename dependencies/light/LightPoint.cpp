@@ -19,16 +19,17 @@ bool App::LightPoint::calculateIllumination(const Vector3d &intersectionPoint, c
     Vector3d sourceFromIntersection = intersectionPoint;
     Ray lightRay (sourceFromIntersection, sourceFromIntersection + lightDirection);
 
-    Vector3d pointOfIntersection;
-    Vector3d pointOfIntersectionNormal;
-    Vector3d pointOfIntersectionColor;
+    //Vector3d pointOfIntersection;
+    //Vector3d pointOfIntersectionNormal;
+    //Vector3d pointOfIntersectionColor;
+    HitInformation hitInformation;
     bool isValidIntersection = false;
     for(const std::shared_ptr<ObjectGeneric>& objectOther: objectsInScene){
         if (object != objectOther){
-            isValidIntersection = objectOther ->isIntersecting(lightRay, pointOfIntersection, pointOfIntersectionNormal, pointOfIntersectionColor);
+            isValidIntersection = objectOther ->isIntersecting(lightRay, hitInformation);
             if(isValidIntersection){
                 // checks if the light is between the two objects (then, no shadow needed)
-                double distance = (pointOfIntersection - sourceFromIntersection).norm();
+                double distance = (hitInformation.pointOfIntersection - sourceFromIntersection).norm();
                 if (distance > lightDistance){
                     isValidIntersection = false;
                 }

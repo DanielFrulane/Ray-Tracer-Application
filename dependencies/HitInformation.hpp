@@ -9,12 +9,12 @@ using namespace Eigen;
 namespace App {
     class ObjectGeneric;
 
-    struct hitInformation {
-        Vector3d pointOfIntersection;
-        Vector3d normal;
-        Vector3d color;
-        Vector3d localPointOfIntersection;
-        Vector3d uvCoordinates;
+    struct HitInformation { // TODO inicializar ou n
+        Vector3d pointOfIntersection = {0.0,0.0,0.0};
+        Vector3d normal = {0.0,0.0,0.0};
+        Vector3d color = {0.0,0.0,0.0};
+        Vector3d localPointOfIntersection = {0.0,0.0,0.0};
+        Vector2d uvCoordinates = {0.0,0.0};
         std::shared_ptr<ObjectGeneric> hitObject;
     };
 

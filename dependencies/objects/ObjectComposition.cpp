@@ -12,11 +12,11 @@ App::ObjectComposition::~ObjectComposition() {
 
 }
 
-void App::ObjectComposition::addObject(std::shared_ptr<ObjectGeneric> subShape) {
-    Vector2d xLim;
-    Vector2d yLim;
-    Vector2d zLim;
-    subShape -> getExtents(xLim, yLim, zLim);
+void App::ObjectComposition::addObject(const std::shared_ptr<ObjectGeneric>& objectToAdd) {
+    Vector2d xLim ={0.0,0.0};
+    Vector2d yLim ={0.0,0.0};
+    Vector2d zLim ={0.0,0.0};
+    objectToAdd -> getExtents(xLim, yLim, zLim);
     if (xLim(0) < m_xLimit(0))
         m_xLimit(0) = xLim(0);
     if (xLim(1) > m_xLimit(1))
@@ -50,9 +50,12 @@ void App::ObjectComposition::addObject(std::shared_ptr<ObjectGeneric> subShape) 
 
     // And modify the bounding box.
     m_boundingBox.setTransformation(m_boundingBoxTransformation);
+    std::cout<<m_boundingBoxTransformation.getNormalTransformation()<<std::endl;
+    std::cout<<m_boundingBoxTransformation.getForward()<<std::endl;
+    std::cout<<m_boundingBoxTransformation.getBackward()<<std::endl;
 
     // Add the sub-shape to the list of sub-shapes.
-    m_objects.push_back(subShape);
+    m_objects.push_back(objectToAdd);
 }
 
 void App::ObjectComposition::getExtents(Vector2d &xLim, Vector2d &yLim, Vector2d &zLim) {
@@ -68,10 +71,10 @@ void App::ObjectComposition::getExtents(Vector2d &xLim, Vector2d &yLim, Vector2d
     double maxX = -ARBITRARY_HIGH_NUMBER;
     double maxY = -ARBITRARY_HIGH_NUMBER;
     double maxZ = -ARBITRARY_HIGH_NUMBER;
-    for (int i=0; i<8; ++i)
-    {
+    std::cout<<"corner points\n";
+    for (int i=0; i<8; ++i){
         cornerPoints.at(i) = m_transformation.applyTransformation(cornerPoints.at(i), FORWARD_TRANSFORMATION);
-
+        std::cout<<cornerPoints.at(i)<<std::endl;
         if (cornerPoints.at(i)(0) < minX){
             minX = cornerPoints.at(i)(0);
         }
@@ -105,38 +108,32 @@ void App::ObjectComposition::getExtents(Vector2d &xLim, Vector2d &yLim, Vector2d
 
 std::shared_ptr<App::ObjectGeneric> App::ObjectComposition::isIntersecting(const Ray &rayCasted,
                                             const Ray &backwardRay,
-                                            Vector3d &intersectionPoint,
-                                            double &currentDistance,
-                                            Vector3d &localNormal, Vector3d &localColor){
-                                            //qbRT::DATA::hitData &hitData) { // PRIVATE
-    //isIntersecting(const Ray &rayCasted, Vector3d &intersectionPoint, Vector3d &localNormal, Vector3d &localColor);
-    // Test for intersections with the sub-shapes.
-    std::shared_ptr<App::ObjectGeneric> validObject = nullptr;
-    //qbRT::DATA::hitData hitData;
-    Vector3d localNormal2 = {0.0,0.0,0.0};
-    Vector3d localColor2 = {0.0,0.0,0.0};
-    for (std::shared_ptr<App::ObjectGeneric> currentObject : m_objects){
+                                            Vector3d &worldIntersectionPoint,
+                                            double &currentDistance, HitInformation &hitInformationTemporary){
+    //int numObjects = m_objects.size();
+    std::shared_ptr<App::ObjectGeneric> returnObject = nullptr;
+    HitInformation hitInformation;
+    for (const std::shared_ptr<App::ObjectGeneric>& currentObject : m_objects){
         if (currentObject -> m_isVisible){
-            bool shapeTest = currentObject -> isIntersecting(backwardRay, intersectionPoint, localNormal2, localColor2); //// modificado
+            bool shapeTest = currentObject -> isIntersecting(backwardRay, hitInformation);
             if (shapeTest){
                 // Transform the intersection point back into world coordinates.
-                Vector3d intersectionPointLocal = m_transformation.applyTransformation(intersectionPoint, FORWARD_TRANSFORMATION); //// modificado
+                Vector3d intersectionPointLocal = m_transformation.applyTransformation(hitInformation.pointOfIntersection, FORWARD_TRANSFORMATION);
 
                 // Compute the distance.
-                double dist = (intersectionPointLocal - rayCasted.m_point1).norm();
+                double distance = (intersectionPointLocal - rayCasted.m_point1).norm();
 
                 // If closest, then this is the shape to use.
-                if (dist < currentDistance){
-                    currentDistance = dist;
-                    validObject = currentObject;
-                    intersectionPoint = intersectionPointLocal;
-                    localNormal = localNormal2;
-                    localColor = localColor2;
+                if (distance < currentDistance){
+                    currentDistance = distance;
+                    returnObject = currentObject;
+                    worldIntersectionPoint = intersectionPointLocal;
+                    hitInformationTemporary = hitInformation;
                 }
             }
         }
     }
-    return validObject;
+    return returnObject;
 }
 
 void App::ObjectComposition::updateBounds() {
@@ -145,9 +142,9 @@ void App::ObjectComposition::updateBounds() {
     m_yLimit = {ARBITRARY_HIGH_NUMBER, -ARBITRARY_HIGH_NUMBER};
     m_zLimit = {ARBITRARY_HIGH_NUMBER, -ARBITRARY_HIGH_NUMBER};
 
-    Vector2d xLim;
-    Vector2d yLim;
-    Vector2d zLim;
+    Vector2d xLim ={0.0,0.0};;
+    Vector2d yLim ={0.0,0.0};;
+    Vector2d zLim ={0.0,0.0};;
     for (const std::shared_ptr<ObjectGeneric>& shape : m_objects){
         shape -> getExtents(xLim, yLim, zLim);
         if (xLim(0) < m_xLimit(0)){
@@ -192,7 +189,7 @@ void App::ObjectComposition::updateBounds() {
     m_boundingBox.setTransformation(m_boundingBoxTransformation);
 }
 
-bool App::ObjectComposition::isIntersecting(const App::Ray &castRay, Vector3d &intersectionPoint, Vector3d &localNormal, Vector3d &localColor) { ////OVERRIDE modificado
+bool App::ObjectComposition::isIntersecting(const App::Ray &castRay, HitInformation &hitInformation) {
     // Check if the object is visible.
     if (!m_isVisible){
         return false;
@@ -204,39 +201,25 @@ bool App::ObjectComposition::isIntersecting(const App::Ray &castRay, Vector3d &i
     // Check for intersection with the bounding box.
     if (!m_isUsingBoundingBox || m_boundingBox.isIntersecting(backwardRay)){
         // We intersected with the bounding box, so check everything else.
-        Vector3d worldIntPoint;
-        double currentDist = 100e6;
-        //qbRT::DATA::hitData tempHitData;
+        Vector3d worldIntPoint = {0.0,0.0,0.0};
+        double currentDistance = 100e6;
+        HitInformation hitInformationTemporary;
+        std::shared_ptr<App::ObjectGeneric> currentObject = isIntersecting(castRay, backwardRay, worldIntPoint, currentDistance, hitInformationTemporary);
 
-        Vector3d pointOfIntersection2;
-        Vector3d normal2;
-        Vector3d color2;
-        Vector3d localPointOfIntersection2;
-        Vector3d uvCoordinates2;
-        std::shared_ptr<ObjectGeneric> hitObject2;
+        if (currentObject != nullptr){
+            Vector3d newNormal = m_transformation.applyNorm(hitInformationTemporary.normal);
+            newNormal.normalize();
+            hitInformationTemporary.hitObject-> calculateUVSpace(hitInformationTemporary.localPointOfIntersection, hitInformation.uvCoordinates);
+            m_uvCoordinates = hitInformation.uvCoordinates; //TODO REMOVE W THREADS
 
-        //std::shared_ptr<App::ObjectGeneric> validObject = TestIntersections(castRay, backwardRay, worldIntPoint, currentDist, tempHitData);
-        std::shared_ptr<App::ObjectGeneric> validObject = isIntersecting(castRay, backwardRay, worldIntPoint, currentDist, localNormal, localColor);
-        if (validObject != nullptr){
-
-            // TODO apply normal?
-            Vector3d originOfObject(0.0,0.0,0.0);
-            Vector3d  newOriginOfObject = m_transformation.applyTransformation(originOfObject, FORWARD_TRANSFORMATION);
-            Vector3d  localNormal2 = worldIntPoint - newOriginOfObject;
-            localNormal.normalize();
-
-            //validObject -> (tempHitData.localPOI, hitData.uvCoords);
-            m_uvCoordinates = validObject->m_uvCoordinates;//TODO REMOVE W THREADS
-
-            // Return these values.
-            intersectionPoint = worldIntPoint;
-            localNormal = localNormal2;
-            localColor = color2;
+            hitInformation.pointOfIntersection = worldIntPoint;
+            hitInformation.normal = newNormal;
+            hitInformation.color = hitInformationTemporary.color;
+            hitInformation.localPointOfIntersection = hitInformationTemporary.localPointOfIntersection;
+            hitInformation.hitObject = hitInformationTemporary.hitObject;
 
             return true;
-        }
-        else
-        {
+        }else{
             // No intersections with internal sub-shapes.
             return false;
         }

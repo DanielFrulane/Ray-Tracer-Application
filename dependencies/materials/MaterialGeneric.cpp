@@ -61,17 +61,18 @@ Vector3d App::MaterialGeneric::calculateReflectionColor(const std::vector<std::s
 
     Ray reflectionRay = Ray(intersectionPoint, intersectionPoint + reflection);
     std::shared_ptr<ObjectGeneric> closestObject;
-    Vector3d closestIntersectionPoint, closestLocalNormal, closestLocalColor;
-    bool isIntersectionFound = castRay(reflectionRay, objectList, currentObject, closestObject, closestIntersectionPoint, closestLocalNormal, closestLocalColor);
+    //Vector3d closestIntersectionPoint, closestLocalNormal, closestLocalColor;
+    HitInformation closestHitInformation;
+    bool isIntersectionFound = castRay(reflectionRay, objectList, currentObject, closestObject, closestHitInformation);
 
     Vector3d materialColor = {0.0,0.0,0.0};
     if (isIntersectionFound && (m_currentNumberOfReflections < m_maximumNumberOfReflections)){
         m_currentNumberOfReflections++;
 
-        if (closestObject -> m_hasMaterial){
-            materialColor = closestObject -> m_material -> calculateColor(objectList, lightList, closestObject, closestIntersectionPoint, closestLocalNormal, reflectionRay);
+        if (closestHitInformation.hitObject -> m_hasMaterial){
+            materialColor = closestHitInformation.hitObject -> m_material -> calculateColor(objectList, lightList, closestHitInformation.hitObject, closestHitInformation.pointOfIntersection, closestHitInformation.normal, reflectionRay); ///// TODO outros param
         } else {
-            materialColor = calculateDiffuseColor(objectList, lightList, closestObject, closestIntersectionPoint, closestLocalNormal, closestObject->m_color);
+            materialColor = calculateDiffuseColor(objectList, lightList, closestHitInformation.hitObject, closestHitInformation.pointOfIntersection, closestHitInformation.normal, closestObject->m_color);
         }
     }
     else
@@ -85,25 +86,22 @@ Vector3d App::MaterialGeneric::calculateReflectionColor(const std::vector<std::s
 
 bool App::MaterialGeneric::castRay(const App::Ray &castRay, const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
                               const std::shared_ptr<ObjectGeneric> &thisObject,
-                              std::shared_ptr<ObjectGeneric> &closestObject, Vector3d &closestIntersectionPoint,
-                              Vector3d &closestLocalNormal, Vector3d &closestLocalColor) {
-    Vector3d intersectionPoint, localNormal, localColor;
-
+                              std::shared_ptr<ObjectGeneric> &closestObject, HitInformation &closestHitInformation) {
+    //Vector3d intersectionPoint, localNormal, localColor; // hit data
+    HitInformation hitInformation;
     double minDist = MINIMAL_DISTANCE;
     bool intersectionFound = false;
     for (std::shared_ptr<ObjectGeneric> currentObject : objectList){
         if (currentObject != thisObject){
-            bool isValidIntersection = currentObject -> isIntersecting(castRay, intersectionPoint, localNormal, localColor);
+            bool isValidIntersection = currentObject -> isIntersecting(castRay, hitInformation);
             if (isValidIntersection) {
                 intersectionFound = true;
-                double dist = (intersectionPoint - castRay.m_point1).norm();
+                double dist = (hitInformation.pointOfIntersection - castRay.m_point1).norm();
 
                 if (dist < minDist){
                     minDist = dist;
                     closestObject = currentObject;
-                    closestIntersectionPoint = intersectionPoint;
-                    closestLocalNormal = localNormal;
-                    closestLocalColor = localColor;
+                    closestHitInformation = hitInformation;
                 }
             }
         }

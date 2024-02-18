@@ -4,11 +4,11 @@
 #include "ObjectGeneric.hpp"
 
 namespace App {
-    class ObjectPlane : public ObjectGeneric {
+    class ObjectPlane : public ObjectGeneric, public std::enable_shared_from_this<ObjectPlane> {
     public:
         ObjectPlane();
         virtual ~ObjectPlane() override;
-        virtual bool isIntersecting(const App::Ray &rayCasted, Vector3d &intersectionPoint, Vector3d &localNormal, Vector3d &localColor) override;
+        virtual bool isIntersecting(const App::Ray &rayCasted, HitInformation &hitInformation) override;
 
     };
 }

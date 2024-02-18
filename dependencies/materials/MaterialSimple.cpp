@@ -51,12 +51,13 @@ Vector3d App::MaterialSimple::calculateSpecularColor(const std::vector<std::shar
         Vector3d startPoint = intersectionPoint + (lightDirection * 0.001);
         Ray ray = Ray(startPoint, startPoint + lightDirection);
 
-        Vector3d pointOfIntersection = {0.0,0.0,0.0};
-        Vector3d pointOfIntersectionNormal = {0.0,0.0,0.0};
-        Vector3d pointOfIntersectionColor = {0.0,0.0,0.0};
+        //Vector3d pointOfIntersection = {0.0,0.0,0.0};
+        //Vector3d pointOfIntersectionNormal = {0.0,0.0,0.0};
+        //Vector3d pointOfIntersectionColor = {0.0,0.0,0.0}; // hitdata
+        HitInformation hitInformation;
         bool isValidIntersection = false;
         for(std::shared_ptr<ObjectGeneric> anotherObject : objectList){
-            isValidIntersection = anotherObject->isIntersecting(ray, pointOfIntersection, pointOfIntersectionNormal, pointOfIntersectionColor);
+            isValidIntersection = anotherObject->isIntersecting(ray, hitInformation);
             if (isValidIntersection){
                 break;
             }

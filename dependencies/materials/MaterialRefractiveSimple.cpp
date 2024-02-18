@@ -72,12 +72,13 @@ Vector3d App::MaterialRefractiveSimple::calculateSpecularColor(const std::vector
 
         /* Loop through all objects in the scene to check if any
             obstruct light from this source. */
-        Vector3d pointOfIntersection;
-        Vector3d pointOfIntersectionNormal;
-        Vector3d pointOfIntersectionColor;
+        //Vector3d pointOfIntersection;
+        //Vector3d pointOfIntersectionNormal;
+        //Vector3d pointOfIntersectionColor;
+        HitInformation hitInformation;
         bool validInt = false;
         for (std::shared_ptr<ObjectGeneric> anotherObject : objectList){
-            validInt = anotherObject -> isIntersecting(lightRay, pointOfIntersection, pointOfIntersectionNormal, pointOfIntersectionColor);
+            validInt = anotherObject -> isIntersecting(lightRay, hitInformation);
             if (validInt){
                 break;
             }
@@ -134,20 +135,22 @@ Vector3d App::MaterialRefractiveSimple::calculateTranslucency(const std::vector<
 
     // Test for secondary intersection with this object.
     std::shared_ptr<ObjectGeneric> closestObject;
-    Vector3d closestIntPoint;
-    Vector3d closestLocalNormal;
-    Vector3d closestLocalColor;
-    Vector3d newIntPoint;
-    Vector3d newLocalNormal;
-    Vector3d newLocalColor;
-    bool test = currentObject -> isIntersecting(refractedRay, newIntPoint, newLocalNormal, newLocalColor);
+    //Vector3d closestIntPoint;
+    //Vector3d closestLocalNormal;
+    //Vector3d closestLocalColor;
+    //Vector3d newIntPoint;
+    //Vector3d newLocalNormal;
+    //Vector3d newLocalColor;
+    HitInformation closestHitInformation;
+    HitInformation hitInformation;
+    bool test = currentObject -> isIntersecting(refractedRay, hitInformation);
     bool intersectionFound = false;
     Ray finalRay;
     if (test){
         // Compute the refracted vector.
         Vector3d p2 = refractedRay.m_orientation;
         p2.normalize();
-        Vector3d tempNormal2 = newLocalNormal;
+        Vector3d tempNormal2 = hitInformation.normal;
         double r2 = m_indexOfRefraction;
         double c2 = -tempNormal2.dot(p2);
         if (c2 < 0.0){
@@ -157,14 +160,14 @@ Vector3d App::MaterialRefractiveSimple::calculateTranslucency(const std::vector<
         Vector3d refractedVector2 = r2*p2 + (r2*c2 - sqrt(1.0-pow(r2,2.0) * (1.0-pow(c2,2.0)))) * tempNormal2;
 
         // Compute the refracted ray.
-        Ray refractedRay2 (newIntPoint + (refractedVector2 * 0.01), newIntPoint + refractedVector2);
+        Ray refractedRay2 (hitInformation.pointOfIntersection + (refractedVector2 * 0.01), hitInformation.pointOfIntersection + refractedVector2);
 
         // Cast this ray into the scene.
-        intersectionFound = castRay(refractedRay2, objectList, currentObject, closestObject, closestIntPoint, closestLocalNormal, closestLocalColor);
+        intersectionFound = castRay(refractedRay2, objectList, currentObject, closestObject, closestHitInformation);
         finalRay = refractedRay2;
     }else{
         /* No secondary intersections were found, so continue the original refracted ray. */
-        intersectionFound = castRay(refractedRay, objectList, currentObject, closestObject, closestIntPoint, closestLocalNormal, closestLocalColor);
+        intersectionFound = castRay(refractedRay, objectList, currentObject, closestObject, closestHitInformation);
         finalRay = refractedRay;
     }
 
@@ -173,9 +176,9 @@ Vector3d App::MaterialRefractiveSimple::calculateTranslucency(const std::vector<
     if (intersectionFound){
         // Check if a material has been assigned.
         if (closestObject -> m_hasMaterial){
-            matColor = closestObject -> m_material -> calculateColor(objectList, lightList, closestObject, closestIntPoint, closestLocalNormal, finalRay);
+            matColor = closestHitInformation.hitObject -> m_material -> calculateColor(objectList, lightList, closestHitInformation.hitObject, closestHitInformation.pointOfIntersection, closestHitInformation.normal, finalRay);
         }else{
-            matColor = MaterialGeneric::calculateDiffuseColor(objectList, lightList, closestObject, closestIntPoint, closestLocalNormal, closestObject->m_color);
+            matColor = MaterialGeneric::calculateDiffuseColor(objectList, lightList, closestHitInformation.hitObject, closestHitInformation.pointOfIntersection, closestHitInformation.normal, closestObject->m_color);
         }
     }else{
         // no change to color

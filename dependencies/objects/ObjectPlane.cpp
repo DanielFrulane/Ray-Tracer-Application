@@ -6,14 +6,14 @@ App::ObjectPlane::ObjectPlane() {
     m_boundingBoxTransformation.setTransformation({ 0.0, 0.0, 0.0 },
                                                   { 0.0, 0.0, 0.0 },
                                                   { 1.0, 1.0, 0.01 });
+    m_uvMapType = uvPLANE;
 }
 
 App::ObjectPlane::~ObjectPlane() {
 
 }
 
-bool App::ObjectPlane::isIntersecting(const App::Ray &rayCasted, Vector3d &intersectionPoint, Vector3d &localNormal,
-                                      Vector3d &localColor) {
+bool App::ObjectPlane::isIntersecting(const App::Ray &rayCasted, HitInformation &hitInformation) {
     Ray backward = m_transformation.applyTransformation(rayCasted, BACKWARD_TRANSFORMATION);
 
     Vector3d orientation = backward.m_orientation;
@@ -28,7 +28,7 @@ bool App::ObjectPlane::isIntersecting(const App::Ray &rayCasted, Vector3d &inter
             if (abs(u) < 1.0 && abs(v) < 1.0){
                 // in the plane
                 Vector3d intersectionLocal = backward.m_point1 + (t*orientation);
-                intersectionPoint = m_transformation.applyTransformation(intersectionLocal, FORWARD_TRANSFORMATION);
+                hitInformation.pointOfIntersection = m_transformation.applyTransformation(intersectionLocal, FORWARD_TRANSFORMATION);
 
                 /*Vector3d localOrigin = {0.0, 0.0, 0.0};
                 Vector3d normalVector = {0.0, 0.0, -1.0};
@@ -37,10 +37,11 @@ bool App::ObjectPlane::isIntersecting(const App::Ray &rayCasted, Vector3d &inter
                 localNormal.normalize();*/
 
                 Vector3d normalVector = {0.0,0.0,-1.0}; // constant
-                localNormal = m_transformation.applyNorm(normalVector);
-                localNormal.normalize();
+                hitInformation.normal = m_transformation.applyNorm(normalVector);
+                hitInformation.normal.normalize();
 
-                localColor = m_color;
+                hitInformation.color = m_color;
+                hitInformation.hitObject = this -> shared_from_this();
 
                 m_uvCoordinates = {u, v};
                 return true;

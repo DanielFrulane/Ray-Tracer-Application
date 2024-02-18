@@ -4,12 +4,12 @@
 #include "ObjectGeneric.hpp"
 
 namespace App {
-    class ObjectSphere : public App::ObjectGeneric{
+    class ObjectSphere : public App::ObjectGeneric, public std::enable_shared_from_this<ObjectSphere>{
     public:
         ObjectSphere();
         ~ObjectSphere() override;
 
-        bool isIntersecting(const Ray &rayCasted, Vector3d &intersectionPoint, Vector3d &localNormal, Vector3d &localColor) override;
+        bool isIntersecting(const Ray &rayCasted, HitInformation &hitInformation) override;
     };
 }
 

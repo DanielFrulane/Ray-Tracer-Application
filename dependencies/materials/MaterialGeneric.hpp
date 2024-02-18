@@ -6,6 +6,7 @@
 #include "../textures/TextureGeneric.hpp"
 #include "../light/LightSource.hpp"
 #include "../Ray.hpp"
+#include "../HitInformation.hpp"
 #include "../../include/Eigen/Eigen"
 
 using namespace Eigen;
@@ -44,8 +45,7 @@ namespace App {
         bool castRay(const Ray &castRay, const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
                      const std::shared_ptr<ObjectGeneric> &thisObject,
                      std::shared_ptr<ObjectGeneric> &closestObject,
-                     Vector3d &closestIntersectionPoint, Vector3d &closestLocalNormal,
-                     Vector3d &closestLocalColor);
+                     HitInformation &closestHitInformation);
 
         void setTexture(const std::shared_ptr<Textures::TextureGeneric> &newTexture);
     };

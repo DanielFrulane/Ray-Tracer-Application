@@ -23,6 +23,12 @@ bool Application::inInitialization() {
         // window initialization and image rendering
         pRenderer = SDL_CreateRenderer(pWindow, -1, 0);
         m_image.initialize(SCREEN_WIDTH, SCREEN_HEIGHT, IMAGE_DEPTH, pRenderer);
+        /*m_scene.m_height = SCREEN_HEIGHT;
+        m_scene.m_width = SCREEN_WIDTH;
+        if (!generateTileGrid(128,90)){
+            std::cout<<"failed tile Grid"<<std::endl;
+            return false;
+        }*/
 
         SDL_SetRenderDrawColor(pRenderer, 255.0, 255.0, 255.0, 255.0);
         SDL_RenderClear(pRenderer);

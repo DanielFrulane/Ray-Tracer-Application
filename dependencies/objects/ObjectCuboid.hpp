@@ -4,7 +4,7 @@
 #include "ObjectGeneric.hpp"
 
 namespace App {
-    class ObjectCuboid : public ObjectGeneric {
+    class ObjectCuboid : public ObjectGeneric, public std::enable_shared_from_this<ObjectCuboid> {
     public:
         /* The default constructor.
             Note that this will define a unit sphere at the origin. */
@@ -14,7 +14,7 @@ namespace App {
         virtual ~ObjectCuboid() override;
 
         // Override the function to test for intersections.
-        virtual bool isIntersecting(const Ray &rayCasted, Vector3d &intersectionPoint, Vector3d &localNormal, Vector3d &localColor) override;
+        virtual bool isIntersecting(const Ray &rayCasted, HitInformation &hitInformation) override;
         bool isIntersecting(const Ray &castRay);
     };
 }

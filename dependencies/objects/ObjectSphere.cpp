@@ -1,19 +1,19 @@
 #include "ObjectSphere.hpp"
 #include <cmath>
-#include <iostream>
 
 App::ObjectSphere::ObjectSphere() {
     m_hasMaterial = false;
     m_boundingBoxTransformation.setTransformation({ 0.0, 0.0, 0.0 },
                                                   { 0.0, 0.0, 0.0 },
                                                   { 1.0, 1.0, 1.0 });
+    m_uvMapType = uvSPHERE;
 }
 
 App::ObjectSphere::~ObjectSphere() {
 
 }
 
-bool App::ObjectSphere::isIntersecting(const App::Ray &rayCasted, Vector3d &intersectionPoint, Vector3d &localNormal, Vector3d &localColor) {
+bool App::ObjectSphere::isIntersecting(const App::Ray &rayCasted, HitInformation &hitInformation) {
     App::Ray backwardRay  = m_transformation.applyTransformation(rayCasted, BACKWARD_TRANSFORMATION);
 
     // ref doc ///////////////
@@ -59,19 +59,22 @@ bool App::ObjectSphere::isIntersecting(const App::Ray &rayCasted, Vector3d &inte
                 }
             }
 
-            intersectionPoint = m_transformation.applyTransformation(pointLocal, FORWARD_TRANSFORMATION);
+            hitInformation.pointOfIntersection = m_transformation.applyTransformation(pointLocal, FORWARD_TRANSFORMATION);
             /*Vector3d originOfObject(0.0,0.0,0.0);
             Vector3d  newOriginOfObject = m_transformation.applyTransformation(originOfObject, FORWARD_TRANSFORMATION);
             localNormal = intersectionPoint - newOriginOfObject;
             localNormal.normalize();*/
 
             Vector3d normalVector = pointLocal;
-            localNormal = m_transformation.applyNorm(normalVector);
-            localNormal.normalize();
+            hitInformation.normal = m_transformation.applyNorm(normalVector);
+            hitInformation.normal.normalize();
 
-            localColor = m_color;
+            hitInformation.color = m_color;
+            hitInformation.hitObject = this -> shared_from_this();
+            calculateUVSpace(pointLocal, hitInformation.uvCoordinates);
+            hitInformation.localPointOfIntersection = pointLocal;
 
-            double x = pointLocal(0);
+            /*double x = pointLocal(0);
             double y = pointLocal(1);
             double z = pointLocal(2);
 
@@ -82,7 +85,7 @@ bool App::ObjectSphere::isIntersecting(const App::Ray &rayCasted, Vector3d &inte
             }
             u /= M_PI;
             v /= M_PI;
-            m_uvCoordinates = {u,v};
+            m_uvCoordinates = {u,v};*/
 
             return true;
         }

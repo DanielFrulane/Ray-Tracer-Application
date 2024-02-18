@@ -18,14 +18,16 @@
 #include "./textures/TextureFlat.hpp"
 #include "./textures/TextureChecker.hpp"
 #include "./textures/TextureGradient.hpp"
+#include "HitInformation.hpp"
 #include <memory>
 
 namespace App {
     class Scene{
-    private:
+    public:
         Camera m_camera;
         std::vector<std::shared_ptr<ObjectGeneric>> m_objectsInScene;
         std::vector<std::shared_ptr<LightSource>> m_lightsInScene;
+        int m_width, m_height;
 
     public:
         explicit Scene(double aspectRatio);
@@ -34,7 +36,7 @@ namespace App {
 
         bool render(RTImage &outputImage);
 
-        bool castRay(Ray &castedRay, std::shared_ptr<ObjectGeneric> &closestObject, Vector3d &closestIntersectionPoint, Vector3d &closestLocalNormal, Vector3d &closestLocalColor);
+        bool castRay(Ray &castedRay, std::shared_ptr<ObjectGeneric> &closestObject, HitInformation &closestHitInformation);
     };
 }
 

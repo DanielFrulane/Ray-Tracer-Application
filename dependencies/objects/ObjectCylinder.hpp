@@ -4,12 +4,12 @@
 #include "ObjectGeneric.hpp"
 
 namespace App {
-    class ObjectCylinder : public ObjectGeneric {
+    class ObjectCylinder : public ObjectGeneric, public std::enable_shared_from_this<ObjectCylinder> {
     public:
         ObjectCylinder();
         virtual ~ObjectCylinder();
 
-        virtual bool isIntersecting(const Ray &rayCasted, Vector3d &intersectionPoint, Vector3d &localNormal, Vector3d &localColor) override;
+        virtual bool isIntersecting(const Ray &rayCasted, HitInformation &hitInformation) override;
     };
 }
 

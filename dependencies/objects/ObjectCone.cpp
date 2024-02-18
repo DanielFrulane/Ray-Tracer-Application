@@ -7,14 +7,14 @@ App::ObjectCone::ObjectCone() {
     m_boundingBoxTransformation.setTransformation({ 0.0, 0.0, 0.0 },
                                                   { 0.0, 0.0, 0.0 },
                                                   { 1.0, 1.0, 1.0 });
-
+    m_uvMapType = uvCYLINDER;
 }
 
 App::ObjectCone::~ObjectCone() {
 
 }
 
-bool App::ObjectCone::isIntersecting(const Ray &castedRay, Vector3d &intersectionPoint, Vector3d &localNormal, Vector3d &localColor) {
+bool App::ObjectCone::isIntersecting(const Ray &castedRay, HitInformation &hitInformation) {
     // Copy the ray and applyTransformation the backwards transform.
     Ray backward = m_transformation.applyTransformation(castedRay, BACKWARD_TRANSFORMATION);
 
@@ -106,7 +106,7 @@ bool App::ObjectCone::isIntersecting(const Ray &castedRay, Vector3d &intersectio
     Vector3d validPointOfIntersection = pointOfIntersection.at(minimalIndex);
     if (minimalIndex < 2){
         // Transform the intersection point back into world coordinates.
-        intersectionPoint = m_transformation.applyTransformation(validPointOfIntersection, FORWARD_TRANSFORMATION);
+        hitInformation.pointOfIntersection = m_transformation.applyTransformation(validPointOfIntersection, FORWARD_TRANSFORMATION);
 
         // Compute the local normal.
         Vector3d originalNormal;
@@ -121,15 +121,16 @@ bool App::ObjectCone::isIntersecting(const Ray &castedRay, Vector3d &intersectio
         originalNormal = txyz;
 
         originalNormal.normalize();
-        newNormal = m_transformation.applyTransformation(originalNormal, FORWARD_TRANSFORMATION) - globalOrigin;
-        newNormal.normalize();
-        localNormal = newNormal;
+        //newNormal = m_transformation.applyTransformation(originalNormal, FORWARD_TRANSFORMATION) - globalOrigin;
+        //newNormal.normalize();
+        //localNormal = newNormal; EXCLUIR DEPENDENCIAS
 
-        localNormal = m_transformation.applyNorm(originalNormal);
-        localNormal.normalize();
+        hitInformation.normal = m_transformation.applyNorm(originalNormal);
+        hitInformation.normal.normalize();
 
         // Return the base color.
-        localColor = m_color;
+        hitInformation.color = m_color;
+        hitInformation.hitObject = this -> shared_from_this();
 
         double x = validPointOfIntersection(0);
         double y = validPointOfIntersection(1);
@@ -147,18 +148,19 @@ bool App::ObjectCone::isIntersecting(const Ray &castedRay, Vector3d &intersectio
             // Check if we are inside the disk.
             if (sqrt(pow(validPointOfIntersection(0), 2.0) + pow(validPointOfIntersection(1), 2.0)) < 1.0){
                 // Transform the intersection point back into world coordinates.
-                intersectionPoint = m_transformation.applyTransformation(validPointOfIntersection, FORWARD_TRANSFORMATION);
+                hitInformation.pointOfIntersection = m_transformation.applyTransformation(validPointOfIntersection, FORWARD_TRANSFORMATION);
 
                 // Compute the local normal.
                 Vector3d localOrigin = {0.0, 0.0, 0.0};
                 Vector3d normalVector = {0.0, 0.0, 1.0};
                 Vector3d globalOrigin = m_transformation.applyTransformation(localOrigin, FORWARD_TRANSFORMATION);
-                localNormal = m_transformation.applyTransformation(normalVector, FORWARD_TRANSFORMATION) - globalOrigin;
+                hitInformation.normal = m_transformation.applyTransformation(normalVector, FORWARD_TRANSFORMATION) - globalOrigin;
                 //localNormal = m_transformation.applyNorm(normalVector);
-                localNormal.normalize();
+                hitInformation.normal.normalize();
 
                 // Return the base color.
-                localColor = m_color;
+                hitInformation.color = m_color;
+                hitInformation.hitObject = this -> shared_from_this();
 
                 double x = validPointOfIntersection(0);
                 double y = validPointOfIntersection(1);

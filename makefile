@@ -1,4 +1,4 @@
-linkTarget = RayTracerApplication
+inkTarget = RayTracerApplication
 
 LIBS = -lSDL2
 

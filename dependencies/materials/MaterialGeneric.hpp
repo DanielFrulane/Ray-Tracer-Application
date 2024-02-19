@@ -4,7 +4,7 @@
 #include <memory>
 #include "../objects/ObjectGeneric.hpp"
 #include "../textures/TextureGeneric.hpp"
-#include "../light/LightSource.hpp"
+#include "../light/LightGeneric.hpp"
 #include "../Ray.hpp"
 #include "../HitInformation.hpp"
 #include "../../include/Eigen/Eigen"
@@ -25,19 +25,20 @@ namespace App {
         virtual ~MaterialGeneric();
 
         virtual Vector3d calculateColor(const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
-                                        const std::vector<std::shared_ptr<LightSource>> &lightList,
+                                        const std::vector<std::shared_ptr<LightGeneric>> &lightList,
                                         const std::shared_ptr<ObjectGeneric> &currentObject,
                                         const Vector3d &intersectionPoint, const Vector3d &localNormal,
+                                        const Vector3d &localPointOfIntersection, const Vector2d &uvCoordinates,
                                         const Ray &cameraRay);
 
         static Vector3d calculateDiffuseColor(const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
-                                              const std::vector<std::shared_ptr<LightSource>> &lightList,
+                                              const std::vector<std::shared_ptr<LightGeneric>> &lightList,
                                               const std::shared_ptr<ObjectGeneric> &currentObject,
                                               const Vector3d &intersectionPoint, const Vector3d &localNormal,
                                               const Vector3d &color);
 
         Vector3d calculateReflectionColor(const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
-                                          const std::vector<std::shared_ptr<LightSource>> &lightList,
+                                          const std::vector<std::shared_ptr<LightGeneric>> &lightList,
                                           const std::shared_ptr<ObjectGeneric> &currentObject,
                                           const Vector3d &intersectionPoint, const Vector3d &localNormal,
                                           const Ray &incidentRay);

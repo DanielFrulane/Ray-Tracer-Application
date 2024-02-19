@@ -1,5 +1,5 @@
-#ifndef RAY_TRACER_APPLICATION_LIGHTSOURCE_HPP
-#define RAY_TRACER_APPLICATION_LIGHTSOURCE_HPP
+#ifndef RAY_TRACER_APPLICATION_LIGHTGENERIC_HPP
+#define RAY_TRACER_APPLICATION_LIGHTGENERIC_HPP
 
 #include <memory>
 #include "../../include/Eigen/Eigen"
@@ -9,14 +9,14 @@
 using namespace Eigen;
 
 namespace App {
-    class LightSource {
+    class LightGeneric {
     public:
         Vector3d m_color;
         Vector3d m_location;
         double m_intensity;
 
-        LightSource();
-        virtual ~LightSource();
+        LightGeneric();
+        virtual ~LightGeneric();
 
         virtual bool calculateIllumination(const Vector3d &intersectionPoint, const Vector3d &localNormal,
                                            const std::vector<std::shared_ptr<App::ObjectGeneric>> &objectsInScene,
@@ -26,4 +26,4 @@ namespace App {
 }
 
 
-#endif //RAY_TRACER_APPLICATION_LIGHTSOURCE_HPP
+#endif //RAY_TRACER_APPLICATION_LIGHTGENERIC_HPP

@@ -1,11 +1,11 @@
-#include "Scene.hpp"
+#include "SceneGeneric.hpp"
 #include <iostream>
 
 # define MINIMAL_DISTANCE 1e6
 
 using namespace Eigen;
 
-App::Scene::Scene() {
+App::SceneGeneric::SceneGeneric() {
     //m_camera.setPosition({0.0,-10.0,-2.0});
     //m_camera.setLookAt({0.0,0.0,0.0});
     //m_camera.setUp({0.0,0.0,1.0});
@@ -19,8 +19,9 @@ App::Scene::Scene() {
     //m_lightsInScene.at(0) -> m_color << 0.5,0.5,0.5;
 }
 
-App::Scene::Scene(double aspectRatio) {
-    m_camera.setPosition({0.0,-10.0,-2.0});
+App::SceneGeneric::SceneGeneric(double aspectRatio) {
+    generateSceneObjects();
+    /*m_camera.setPosition({0.0,-10.0,-2.0});
     m_camera.setLookAt({0.0,0.0,0.0});
     m_camera.setUp({0.0,0.0,1.0});
     m_camera.setHorizontalSize(0.75);
@@ -71,7 +72,7 @@ App::Scene::Scene(double aspectRatio) {
     m_objectsInScene.at(0) ->setMaterial(floorMaterial);
     m_objectsInScene.at(0) ->m_uvMapType = uvPLANE; // TODO use?
 
-    /*m_objectsInScene.push_back(std::make_shared<ObjectCylinder>(ObjectCylinder()));
+    m_objectsInScene.push_back(std::make_shared<ObjectCylinder>(ObjectCylinder()));
     m_objectsInScene.at(1) -> m_color << 0.25, 0.5, 0.8;
     GeometricalTransformation testMatrix1;
     testMatrix1.setTransformation({0.0, 0.0, -3.0},{M_PI/4, M_PI/4, M_PI/4},{1.0, 1.0, 1.0});
@@ -99,7 +100,7 @@ App::Scene::Scene(double aspectRatio) {
     m_objectsInScene.at(4) -> setTransformation(testMatrix4);
     m_objectsInScene.at(4) ->setMaterial(glass);*/
 
-    std::shared_ptr<ObjectSphere> mySphere = std::make_shared<ObjectSphere>(ObjectSphere());
+    /*std::shared_ptr<ObjectSphere> mySphere = std::make_shared<ObjectSphere>(ObjectSphere());
     mySphere->setMaterial(whiteDiffuse);
     std::shared_ptr<ObjectSphere> mySphere2 = std::make_shared<ObjectSphere>(ObjectSphere());
     mySphere2->setMaterial(whiteDiffuse);
@@ -113,9 +114,9 @@ App::Scene::Scene(double aspectRatio) {
     mySphere2 -> setTransformation(testMatrix7);
     composite -> addObject(mySphere);
     composite -> addObject(mySphere2);
-    m_objectsInScene.push_back(composite);
+    m_objectsInScene.push_back(composite);*/
 
-    m_lightsInScene.push_back(std::make_shared<LightPoint>(LightPoint()));
+    /*m_lightsInScene.push_back(std::make_shared<LightPoint>(LightPoint()));
     m_lightsInScene.at(0) -> m_location << 5.0,-10.0,-5.0;
     m_lightsInScene.at(0) -> m_color << 1.0,0.0,1.0;
 
@@ -128,29 +129,31 @@ App::Scene::Scene(double aspectRatio) {
     m_lightsInScene.at(2) -> m_color << 1.0,1.0,0.0;
 
     std::cout<<"Objects in scene: "<<m_objectsInScene.size()<<std::endl;
-    std::cout<<"Objects in composite: "<<composite->m_objects.size()<<std::endl;
-    std::cout<<"Lights in scene: "<<m_lightsInScene.size()<<std::endl;
+    //std::cout<<"Objects in composite: "<<composite->m_objects.size()<<std::endl;
+    std::cout<<"Lights in scene: "<<m_lightsInScene.size()<<std::endl;*/
 }
 
-bool App::Scene::render(RTImage &outputImage) {
+bool App::SceneGeneric::render(RTImage &outputImage) {
     int height = outputImage.getHeightSize();
     int width = outputImage.getWidthSize();
 
     // for every pixel in image
     App::Ray cameraRay;
-    double xFactor = 1.0 / (static_cast<double>(width)/2.0);
-    double yFactor = 1.0 / (static_cast<double>(height)/2.0);
+    //double xFactor = 1.0 / (static_cast<double>(width)/2.0);
+    //double yFactor = 1.0 / (static_cast<double>(height)/2.0);
     for (int x = 0; x < width; ++x) {
         if (x % 100 == 0){
             std::cout << "Processing line " << x << " of " << width << "." << std::endl;
         }
         for (int y = 0; y < height; ++y) {
-            double normX = (static_cast<double>(x) * xFactor) - 1.0;
-            double normY = (static_cast<double>(y) * yFactor) - 1.0;
+            //double normX = (static_cast<double>(x) * xFactor) - 1.0;
+            //double normY = (static_cast<double>(y) * yFactor) - 1.0;
 
-            m_camera.generateRay(normX, normY, cameraRay);
+            Vector3d pixelColor = renderPixel(x,y,width,height);
+            outputImage.setPixel(x,y,pixelColor);
+            //m_camera.generateRay(normX, normY, cameraRay);
 
-            std::shared_ptr<ObjectGeneric> closestObject;
+            /*std::shared_ptr<ObjectGeneric> closestObject;
             //Vector3d closestIntersectionPoint;
             //Vector3d closestLocalNormal;
             //Vector3d closestLocalColor;
@@ -168,14 +171,14 @@ bool App::Scene::render(RTImage &outputImage) {
                     Vector3d color = MaterialGeneric::calculateDiffuseColor(m_objectsInScene, m_lightsInScene, hitInformation.hitObject, hitInformation.pointOfIntersection, hitInformation.normal, closestObject->m_color);
                     outputImage.setPixel(x,y,color);
                 }
-            }
+            }*/
         }
     }
     return true;
 }
 
-bool App::Scene::castRay(App::Ray &castedRay, std::shared_ptr<ObjectGeneric> &closestObject,
-                         HitInformation &closestHitInformation) {
+bool App::SceneGeneric::castRay(App::Ray &castedRay, std::shared_ptr<ObjectGeneric> &closestObject,
+                                HitInformation &closestHitInformation) {
     //Vector3d intersectionPoint;
     //Vector3d localNormal;
     //Vector3d localColor;
@@ -197,4 +200,59 @@ bool App::Scene::castRay(App::Ray &castedRay, std::shared_ptr<ObjectGeneric> &cl
         }
     }
     return intersectionFound;
+}
+
+App::SceneGeneric::~SceneGeneric() {
+
+}
+
+void App::SceneGeneric::renderTile(App::TileInformation *tile) {
+    Vector3d pixelColor;
+    for (int y = 0; y < tile->height; ++y) {
+        for (int x = 0; x < tile->width; ++x) {
+            pixelColor = renderPixel(tile->x+x,tile->y+y,m_width,m_height);
+            tile->rgb.at(convertCoordinatesToLinearIndex(x,y,tile->width,tile->height)) = pixelColor;
+        }
+    }
+    tile->renderComplete = true;
+}
+
+void App::SceneGeneric::generateSceneObjects() {
+
+}
+
+Vector3d App::SceneGeneric::renderPixel(int x, int y, int width, int height) {
+
+    std::shared_ptr<ObjectGeneric> closestObject;
+    App::Ray cameraRay;
+    double xFactor = 1.0 / (static_cast<double>(width)/2.0);
+    double yFactor = 1.0 / (static_cast<double>(height)/2.0);
+    double normX = (static_cast<double>(x) * xFactor) - 1.0;
+    double normY = (static_cast<double>(y) * yFactor) - 1.0;
+
+    m_camera.generateRay(normX, normY, cameraRay);
+
+    HitInformation hitInformation;
+    bool intersectionFound = castRay(cameraRay, closestObject, hitInformation);
+    Vector3d color;
+    if (intersectionFound){
+        if (hitInformation.hitObject->m_hasMaterial){
+            // color from material
+            MaterialGeneric::m_currentNumberOfReflections = 0;
+            color = hitInformation.hitObject->m_material->calculateColor(m_objectsInScene, m_lightsInScene, hitInformation.hitObject, hitInformation.pointOfIntersection, hitInformation.normal, hitInformation.localPointOfIntersection, hitInformation.uvCoordinates, cameraRay);
+        } else {
+            // basic color calculation
+            color = MaterialGeneric::calculateDiffuseColor(m_objectsInScene, m_lightsInScene, hitInformation.hitObject, hitInformation.pointOfIntersection, hitInformation.normal, closestObject->m_color);
+        }
+    }else{
+        color = {0.0,0.0,0.0};
+    }
+    return color;
+}
+
+int App::SceneGeneric::convertCoordinatesToLinearIndex(int x, int y, int width, int height) {
+    if ((x<width) && (x>= 0) && (y<height) && (y >= 0)){
+        return (y*width) + x;
+    }
+    return -1;
 }

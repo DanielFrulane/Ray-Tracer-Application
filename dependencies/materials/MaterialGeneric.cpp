@@ -14,15 +14,16 @@ App::MaterialGeneric::~MaterialGeneric() {
 }
 
 Vector3d App::MaterialGeneric::calculateColor(const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
-                                              const std::vector<std::shared_ptr<LightSource>> &lightList,
+                                              const std::vector<std::shared_ptr<LightGeneric>> &lightList,
                                               const std::shared_ptr<ObjectGeneric> &currentObject,
                                               const Vector3d &intersectionPoint, const Vector3d &localNormal,
+                                              const Vector3d &localPointOfIntersection, const Vector2d &uvCoordinates,
                                               const App::Ray &cameraRay) {
     return {0.0,0.0,0.0};
 }
 
 Vector3d App::MaterialGeneric::calculateDiffuseColor(const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
-                                                     const std::vector<std::shared_ptr<LightSource>> &lightList,
+                                                     const std::vector<std::shared_ptr<LightGeneric>> &lightList,
                                                      const std::shared_ptr<ObjectGeneric> &currentObject,
                                                      const Vector3d &intersectionPoint, const Vector3d &localNormal,
                                                      const Vector3d &localColor) {
@@ -31,7 +32,7 @@ Vector3d App::MaterialGeneric::calculateDiffuseColor(const std::vector<std::shar
     Vector3d color = {0.0,0.0,0.0};
     Vector3d rgb = {0.0,0.0,0.0};
     bool illuminationFound = false;
-    for (const std::shared_ptr<LightSource>& currentLight : lightList) {
+    for (const std::shared_ptr<LightGeneric>& currentLight : lightList) {
         bool isIlluminated = currentLight->calculateIllumination(intersectionPoint, localNormal, objectList, currentObject, color, intensity);
         if (isIlluminated){
             illuminationFound = true;
@@ -51,7 +52,7 @@ Vector3d App::MaterialGeneric::calculateDiffuseColor(const std::vector<std::shar
 }
 
 Vector3d App::MaterialGeneric::calculateReflectionColor(const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
-                                                        const std::vector<std::shared_ptr<LightSource>> &lightList,
+                                                        const std::vector<std::shared_ptr<LightGeneric>> &lightList,
                                                         const std::shared_ptr<ObjectGeneric> &currentObject,
                                                         const Vector3d &intersectionPoint, const Vector3d &localNormal,
                                                         const App::Ray &incidentRay) {
@@ -70,7 +71,7 @@ Vector3d App::MaterialGeneric::calculateReflectionColor(const std::vector<std::s
         m_currentNumberOfReflections++;
 
         if (closestHitInformation.hitObject -> m_hasMaterial){
-            materialColor = closestHitInformation.hitObject -> m_material -> calculateColor(objectList, lightList, closestHitInformation.hitObject, closestHitInformation.pointOfIntersection, closestHitInformation.normal, reflectionRay); ///// TODO outros param
+            materialColor = closestHitInformation.hitObject -> m_material -> calculateColor(objectList, lightList, closestHitInformation.hitObject, closestHitInformation.pointOfIntersection, closestHitInformation.normal, closestHitInformation.localPointOfIntersection, closestHitInformation.uvCoordinates, reflectionRay); ///// TODO outros param
         } else {
             materialColor = calculateDiffuseColor(objectList, lightList, closestHitInformation.hitObject, closestHitInformation.pointOfIntersection, closestHitInformation.normal, closestObject->m_color);
         }

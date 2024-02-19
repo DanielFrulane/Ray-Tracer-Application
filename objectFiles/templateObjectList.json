@@ -1,0 +1,44 @@
+{
+    "type": "objectList",
+    "transformationMatrix": null,
+    "objectList": [{
+        "type": "sphere",
+        "transformationMatrix": {
+            "translation": {"x": 1, "y": 1,"z": 1},
+            "rotation": {"x": 1, "y": 1, "z": 1},
+            "scale": {"x": 1,"y": 1,"z": 1}
+        },
+        "material": {
+            "type": "material",
+            "color": {"red":1, "green":1, "blue":1},
+            "reflectivity": 0.3,
+            "shininess": 0.3,
+            "translucency": 0.75,
+            "indexOfRefraction": 1.333,
+            "texture": {
+                "type": "flat",
+                "color": {"red":1, "green":1, "blue":1}
+            }
+        }
+    },
+    {
+        "type": "sphere",
+        "transformationMatrix": {
+            "translation": {"x": 1, "y": 1,"z": 1},
+            "rotation": {"x": 1, "y": 1, "z": 1},
+            "scale": {"x": 1,"y": 1,"z": 1}
+        },
+        "material": {
+            "type": "material",
+            "color": {"red":1, "green":1, "blue":1},
+            "reflectivity": 0.3,
+            "shininess": 0.3,
+            "translucency": 0.75,
+            "indexOfRefraction": 1.333,
+            "texture": {
+                "type": "flat",
+                "color": {"red":1, "green":1, "blue":1}
+            }
+        }
+    }]
+}

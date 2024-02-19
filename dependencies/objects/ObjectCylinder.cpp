@@ -132,8 +132,10 @@ bool App::ObjectCylinder::isIntersecting(const App::Ray &rayCasted, HitInformati
 
         double u = atan2(y,x)/M_PI;
         double v = z;
+        calculateUVSpace(validPointOfIntersection, hitInformation.uvCoordinates);
+        hitInformation.localPointOfIntersection = validPointOfIntersection;
 
-        m_uvCoordinates = {u,v};
+        //m_uvCoordinates = {u,v};
 
         return true;
     } else {
@@ -161,7 +163,9 @@ bool App::ObjectCylinder::isIntersecting(const App::Ray &rayCasted, HitInformati
                 double x = validPointOfIntersection(0);
                 double y = validPointOfIntersection(1);
 
-                m_uvCoordinates = {x,y};
+                calculateUVSpace(validPointOfIntersection, hitInformation.uvCoordinates);
+                hitInformation.localPointOfIntersection = validPointOfIntersection;
+                //m_uvCoordinates = {x,y};
 
                 return true;
             } else {

@@ -1,8 +1,0 @@
-{
-    "color": {"red":1, "green":1, "blue":1},
-    "reflectivity": 0.3,
-    "shininess": 0.3,
-    "translucency": 0.75,
-    "indexOfRefraction": 1.333,
-    "texture": null
-}

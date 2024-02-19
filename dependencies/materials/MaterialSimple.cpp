@@ -10,18 +10,20 @@ App::MaterialSimple::~MaterialSimple() {
 }
 
 Vector3d App::MaterialSimple::calculateColor(const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
-                                             const std::vector<std::shared_ptr<LightSource>> &lightList,
+                                             const std::vector<std::shared_ptr<LightGeneric>> &lightList,
                                              const std::shared_ptr<ObjectGeneric> &currentObject,
                                              const Vector3d &intersectionPoint, const Vector3d &localNormal,
+                                             const Vector3d &localPointOfIntersection, const Vector2d &uvCoordinates,
                                              const App::Ray &cameraRay) {
     Vector3d materialColor={0.0,0.0,0.0};
-    Vector3d reflectionColor={0.0,0.0,0.0};;
-    Vector3d diffuseColor={0.0,0.0,0.0};;
-    Vector3d specularColor={0.0,0.0,0.0};;
+    Vector3d reflectionColor={0.0,0.0,0.0};
+    Vector3d diffuseColor={0.0,0.0,0.0};
+    Vector3d specularColor={0.0,0.0,0.0};
 
     if(m_hasTexture){
+        // get texture color?
         diffuseColor = calculateDiffuseColor(objectList, lightList, currentObject, intersectionPoint, localNormal,
-                                             m_textures.at(0)->getColor(currentObject->m_uvCoordinates));
+                                             m_textures.at(0)->getColor(uvCoordinates)); //////// TODO UV COORDS
     } else {
         diffuseColor = calculateDiffuseColor(objectList, lightList, currentObject, intersectionPoint, localNormal, m_color);
     }
@@ -40,12 +42,12 @@ Vector3d App::MaterialSimple::calculateColor(const std::vector<std::shared_ptr<O
 }
 
 Vector3d App::MaterialSimple::calculateSpecularColor(const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
-                                                     const std::vector<std::shared_ptr<LightSource>> &lightList,
+                                                     const std::vector<std::shared_ptr<LightGeneric>> &lightList,
                                                      const Vector3d &intersectionPoint, const Vector3d &localNormal,
                                                      const App::Ray &cameraRay) {
     Vector3d rgb = {0.0,0.0,0.0};
 
-    for(std::shared_ptr<LightSource> currentLight : lightList){
+    for(const std::shared_ptr<LightGeneric>& currentLight : lightList){
         double intensity = 0.0;
         Vector3d lightDirection = (currentLight->m_location - intersectionPoint).normalized();
         Vector3d startPoint = intersectionPoint + (lightDirection * 0.001);
@@ -56,7 +58,7 @@ Vector3d App::MaterialSimple::calculateSpecularColor(const std::vector<std::shar
         //Vector3d pointOfIntersectionColor = {0.0,0.0,0.0}; // hitdata
         HitInformation hitInformation;
         bool isValidIntersection = false;
-        for(std::shared_ptr<ObjectGeneric> anotherObject : objectList){
+        for(const std::shared_ptr<ObjectGeneric>& anotherObject : objectList){
             isValidIntersection = anotherObject->isIntersecting(ray, hitInformation);
             if (isValidIntersection){
                 break;

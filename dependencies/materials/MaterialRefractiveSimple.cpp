@@ -9,9 +9,10 @@ App::MaterialRefractiveSimple::~MaterialRefractiveSimple() {
 }
 
 Vector3d App::MaterialRefractiveSimple::calculateColor(const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
-                                                       const std::vector<std::shared_ptr<LightSource>> &lightList,
+                                                       const std::vector<std::shared_ptr<LightGeneric>> &lightList,
                                                        const std::shared_ptr<ObjectGeneric> &currentObject,
                                                        const Vector3d &intersectionPoint, const Vector3d &localNormal,
+                                                       const Vector3d &localPointOfIntersection, const Vector2d &uvCoordinates,
                                                        const App::Ray &cameraRay) {
     Vector3d materialColor = {0.0,0.0,0.0};
     Vector3d reflectiveColor = {0.0,0.0,0.0};
@@ -20,7 +21,7 @@ Vector3d App::MaterialRefractiveSimple::calculateColor(const std::vector<std::sh
     Vector3d translucentColor = {0.0,0.0,0.0};
 
     if (m_hasTexture){
-        diffuseColor = calculateDiffuseColor(objectList, lightList, currentObject, intersectionPoint, localNormal, m_textures.at(0)->getColor(currentObject->m_uvCoordinates));
+        diffuseColor = calculateDiffuseColor(objectList, lightList, currentObject, intersectionPoint, localNormal, m_textures.at(0)->getColor(uvCoordinates)); ////////// TODO UV COORDS
     } else {
         diffuseColor = calculateDiffuseColor(objectList, lightList, currentObject, intersectionPoint, localNormal, m_color);
     }
@@ -50,14 +51,14 @@ Vector3d App::MaterialRefractiveSimple::calculateColor(const std::vector<std::sh
 }
 
 Vector3d App::MaterialRefractiveSimple::calculateSpecularColor(const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
-                                                              const std::vector<std::shared_ptr<LightSource>> &lightList,
+                                                              const std::vector<std::shared_ptr<LightGeneric>> &lightList,
                                                               const Vector3d &intersectionPoint, const Vector3d &localNormal,
                                                               const App::Ray &cameraRay) {
     Vector3d specularColor;
     Vector3d  rgb = {0.0,0.0,0.0};
 
     // Loop through all of the lights in the scene.
-    for (std::shared_ptr<LightSource> currentLight : lightList){
+    for (std::shared_ptr<LightGeneric> currentLight : lightList){
         /* Check for intersections with all objects in the scene. */
         double intensity = 0.0;
 
@@ -111,7 +112,7 @@ Vector3d App::MaterialRefractiveSimple::calculateSpecularColor(const std::vector
 }
 
 Vector3d App::MaterialRefractiveSimple::calculateTranslucency(const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
-                                                             const std::vector<std::shared_ptr<LightSource>> &lightList,
+                                                             const std::vector<std::shared_ptr<LightGeneric>> &lightList,
                                                              const std::shared_ptr<ObjectGeneric> &currentObject,
                                                              const Vector3d &intersectionPoint, const Vector3d &localNormal,
                                                              const App::Ray &cameraRay) {
@@ -176,7 +177,7 @@ Vector3d App::MaterialRefractiveSimple::calculateTranslucency(const std::vector<
     if (intersectionFound){
         // Check if a material has been assigned.
         if (closestObject -> m_hasMaterial){
-            matColor = closestHitInformation.hitObject -> m_material -> calculateColor(objectList, lightList, closestHitInformation.hitObject, closestHitInformation.pointOfIntersection, closestHitInformation.normal, finalRay);
+            matColor = closestHitInformation.hitObject -> m_material -> calculateColor(objectList, lightList, closestHitInformation.hitObject, closestHitInformation.pointOfIntersection, closestHitInformation.normal, closestHitInformation.localPointOfIntersection, closestHitInformation.uvCoordinates, finalRay);
         }else{
             matColor = MaterialGeneric::calculateDiffuseColor(objectList, lightList, closestHitInformation.hitObject, closestHitInformation.pointOfIntersection, closestHitInformation.normal, closestObject->m_color);
         }

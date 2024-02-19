@@ -42,8 +42,10 @@ bool App::ObjectPlane::isIntersecting(const App::Ray &rayCasted, HitInformation 
 
                 hitInformation.color = m_color;
                 hitInformation.hitObject = this -> shared_from_this();
-
-                m_uvCoordinates = {u, v};
+                //calculateUVSpace(intersectionLocal, hitInformation.uvCoordinates);
+                hitInformation.localPointOfIntersection = intersectionLocal;
+                hitInformation.uvCoordinates = {u,v};
+                //m_uvCoordinates = {u, v};
                 return true;
             } else {
                 return false;

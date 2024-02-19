@@ -1,12 +1,12 @@
 #ifndef RAY_TRACER_APPLICATION_LIGHTPOINT_HPP
 #define RAY_TRACER_APPLICATION_LIGHTPOINT_HPP
 
-#include "LightSource.hpp"
+#include "LightGeneric.hpp"
 #include "../HitInformation.hpp"
 #include "../objects/ObjectGeneric.hpp"
 
 namespace App {
-    class LightPoint : public App::LightSource {
+    class LightPoint : public App::LightGeneric {
     public:
         LightPoint();
         virtual ~LightPoint() override;

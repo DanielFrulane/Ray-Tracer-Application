@@ -1,0 +1,6 @@
+{
+  "type": "camera",
+  "lookAt": {"x": 1, "y": 1,"z": 1},
+  "horizontalSize": 0.75,
+  "aspectRatio": 1.0
+}

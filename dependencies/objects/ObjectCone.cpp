@@ -139,7 +139,9 @@ bool App::ObjectCone::isIntersecting(const Ray &castedRay, HitInformation &hitIn
         double u = atan2(y,x)/M_PI;
         double v = (z * 2.0) + 1.0;
 
-        m_uvCoordinates = {u,v};
+        calculateUVSpace(validPointOfIntersection, hitInformation.uvCoordinates);
+        hitInformation.localPointOfIntersection = validPointOfIntersection;
+        //m_uvCoordinates = {u,v};
 
         return true;
     }else{
@@ -166,7 +168,9 @@ bool App::ObjectCone::isIntersecting(const Ray &castedRay, HitInformation &hitIn
                 double y = validPointOfIntersection(1);
                 double z = validPointOfIntersection(2);
 
-                m_uvCoordinates = {x,y};
+                calculateUVSpace(validPointOfIntersection, hitInformation.uvCoordinates);
+                hitInformation.localPointOfIntersection = validPointOfIntersection;
+                //m_uvCoordinates = {x,y};
 
                 return true;
             }else{

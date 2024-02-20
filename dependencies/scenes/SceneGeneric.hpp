@@ -14,6 +14,7 @@
 #include "../objects/ObjectCone.hpp"
 #include "../objects/ObjectCuboid.hpp"
 #include "../objects/ObjectComposition.hpp"
+#include "../objects/GeometricalTransformation.hpp"
 #include "../light/LightPoint.hpp"
 #include "../textures/TextureFlat.hpp"
 #include "../textures/TextureChecker.hpp"

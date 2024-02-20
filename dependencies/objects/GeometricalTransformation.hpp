@@ -24,7 +24,7 @@ namespace App {
         GeometricalTransformation(const Matrix4d &forward, const Matrix4d &backward);
         GeometricalTransformation(const Vector3d &translation, const Vector3d &rotation, const Vector3d &scale);
 
-        void setTransformation(const Vector3d &translation, const Vector3d &rotation, const Vector3d &scale);
+        void setTransformation(const Vector3d &translation, const Vector3d &rotationInPercentage, const Vector3d &scale);
 
         Matrix4d getForward() const;
         Matrix4d getBackward() const;

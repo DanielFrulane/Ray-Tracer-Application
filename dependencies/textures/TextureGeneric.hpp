@@ -18,7 +18,7 @@ namespace App {
             
             virtual Vector3d getColor(const Vector2d &uvCoordinates);
 
-            void setTransformation(const Vector2d &translation, const double &rotation, const Vector2d &scale);
+            void setTransformation(const Vector2d &translation, const double &rotationInPercentage, const Vector2d &scale);
 
             static Vector3d blendRGBAColorsToRGB(const std::vector<Vector3d> &inputColorList);
 

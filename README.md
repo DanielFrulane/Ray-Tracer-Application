@@ -1,6 +1,6 @@
 # Ray-Tracer-Application
 
-This is an ongoing project for the implementation of Ray Tracing in C++ using SDL, Eigen and .json files.
+This is an ongoing project for the implementation of Ray Tracing in C++ using SDL, Eigen, opencv and rapidjason.
 
 I'm currently following the tutorial made by QuantitativeBytes on YouTube: https://www.youtube.com/playlist?list=PL3WoIG-PLjSt54LvzY2SuBQDl-cXa11Tm
 

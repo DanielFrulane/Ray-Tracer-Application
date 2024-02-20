@@ -14,10 +14,13 @@ Vector3d App::Textures::TextureGeneric::getColor(const Vector2d &uvCoordinates) 
     return {};
 }
 
-void App::Textures::TextureGeneric::setTransformation(const Vector2d &translation, const double &rotation,
+void App::Textures::TextureGeneric::setTransformation(const Vector2d &translation, const double &rotationInPercentage,
                                                       const Vector2d &scale) {
+
+
+    double rotation = rotationInPercentage * 2 * M_PI;
     Matrix3d rotationMatrix {{cos(rotation), -sin(rotation), 0.0},
-                             {sin(rotation), cos(rotation), 0.0},
+                             {sin(rotation), cos(rotation),  0.0},
                              {0.0, 0.0, 1.0}};
 
     Matrix3d scaleMatrix {{scale(0), 0.0, 0.0},

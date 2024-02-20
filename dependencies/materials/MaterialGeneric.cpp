@@ -5,8 +5,6 @@
 App::MaterialGeneric::MaterialGeneric() {
     m_maximumNumberOfReflections = 3;
     m_currentNumberOfReflections = 0;
-    m_ambientColor = {0.0,0.0,0.0};
-    m_ambientColorIntensity = 0.2;
 }
 
 App::MaterialGeneric::~MaterialGeneric() {
@@ -44,9 +42,7 @@ Vector3d App::MaterialGeneric::calculateDiffuseColor(const std::vector<std::shar
         diffuseColor(1) = rgb(1) * localColor(1);
         diffuseColor(2) = rgb(2) * localColor(2);
     } else {
-        diffuseColor(0) = m_ambientColor(0) * m_ambientColorIntensity * localColor(0);
-        diffuseColor(1) = m_ambientColor(1) * m_ambientColorIntensity * localColor(1);
-        diffuseColor(2) = m_ambientColor(2) * m_ambientColorIntensity * localColor(2);
+        diffuseColor = {0.0,0.0,0.0};
     }
     return diffuseColor;
 }

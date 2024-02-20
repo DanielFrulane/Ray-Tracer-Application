@@ -16,8 +16,6 @@ namespace App {
     public:
         inline static int m_maximumNumberOfReflections;
         inline static int m_currentNumberOfReflections;
-        inline static Vector3d m_ambientColor = {0.0,0.0,0.0};
-        inline static double m_ambientColorIntensity = 0.2;
         std::vector<std::shared_ptr<Textures::TextureGeneric>> m_textures;
         bool m_hasTexture = false;
     public:

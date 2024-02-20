@@ -14,7 +14,7 @@ App::SceneBasic::~SceneBasic() {
 void App::SceneBasic::generateSceneObjects() {
     m_camera.setPosition({0.0,-10.0,-2.0});
     m_camera.setLookAt({0.0,0.0,0.0});
-    m_camera.setUp({0.0,0.0,1.0});
+    m_camera.setUp({0.5,0.0,1.0});
     m_camera.setHorizontalSize(0.75);
     m_camera.setAspectRatio(aspectRatio);
     m_camera.updateStatus();
@@ -24,7 +24,7 @@ void App::SceneBasic::generateSceneObjects() {
     floorMaterial -> m_reflectivity = 0.5;
     floorMaterial -> m_shininess = 0.0;
     std::shared_ptr<Textures::TextureChecker> floorTexture = std::make_shared<Textures::TextureChecker> (Textures::TextureChecker());
-    floorTexture->setTransformation({0.0,0.0},M_PI/4,{16.0,16.0});
+    floorTexture->setTransformation({0.0,0.0},1.0/8.0,{16.0,16.0});
     floorMaterial->setTexture(floorTexture);
 
 
@@ -66,7 +66,7 @@ void App::SceneBasic::generateSceneObjects() {
     m_objectsInScene.push_back(std::make_shared<ObjectCylinder>(ObjectCylinder()));
     m_objectsInScene.at(1) -> m_color << 0.25, 0.5, 0.8;
     GeometricalTransformation testMatrix1;
-    testMatrix1.setTransformation({0.0, 0.0, -3.0},{M_PI/4, M_PI/4, M_PI/4},{1.0, 1.0, 1.0});
+    testMatrix1.setTransformation({0.0, 0.0, -3.0},{1.0/8.0, 1.0/8.0, 1.0/8.0},{1.0, 1.0, 1.0});
     m_objectsInScene.at(1) -> setTransformation(testMatrix1);
     m_objectsInScene.at(1) ->setMaterial(whiteDiffuse);
 
@@ -80,7 +80,7 @@ void App::SceneBasic::generateSceneObjects() {
     m_objectsInScene.push_back(std::make_shared<ObjectCuboid>(ObjectCuboid()));
     m_objectsInScene.at(3) -> m_color << 0.25, 0.5, 0.8;
     GeometricalTransformation testMatrix3;
-    testMatrix3.setTransformation({0.0, -6.0, 0.0}, {M_PI/4, M_PI/4, M_PI/4}, {2.0, 1.5, 0.5});
+    testMatrix3.setTransformation({0.0, -6.0, 0.0}, {1.0/8.0, 1.0/8.0, 1.0/8.0}, {2.0, 1.5, 0.5});
     m_objectsInScene.at(3) -> setTransformation(testMatrix3);
     m_objectsInScene.at(3) ->setMaterial(gradMat);
 
@@ -114,15 +114,15 @@ void App::SceneBasic::generateSceneObjects() {
     m_objectsInScene.push_back(composite);*/
 
     m_lightsInScene.push_back(std::make_shared<LightPoint>(LightPoint()));
-    m_lightsInScene.at(0) -> m_location << 5.0,-10.0,-5.0;
+    m_lightsInScene.at(0) -> m_position << 5.0,-10.0,-5.0;
     m_lightsInScene.at(0) -> m_color << 1.0,0.4,0.4;
 
     m_lightsInScene.push_back(std::make_shared<LightPoint>(LightPoint()));
-    m_lightsInScene.at(1) -> m_location << -5.0,-10.0,-5.0;
+    m_lightsInScene.at(1) -> m_position << -5.0,-10.0,-5.0;
     m_lightsInScene.at(1) -> m_color << 0.4,1.0,0.4;
 
     m_lightsInScene.push_back(std::make_shared<LightPoint>(LightPoint()));
-    m_lightsInScene.at(2) -> m_location << 0.0,-10.0,-5.0;
+    m_lightsInScene.at(2) -> m_position << 0.0,-10.0,-5.0;
     m_lightsInScene.at(2) -> m_color << 0.4,0.4,1.0;
 
     std::cout<<"Objects in scene: "<<m_objectsInScene.size()<<std::endl;

@@ -33,7 +33,7 @@ App::GeometricalTransformation::GeometricalTransformation(const Matrix4d &forwar
     m_backwardTransformation = backward;
 }
 
-void App::GeometricalTransformation::setTransformation(const Vector3d &translation, const Vector3d &rotation, const Vector3d &scale) {
+void App::GeometricalTransformation::setTransformation(const Vector3d &translation, const Vector3d &rotationInPercentage, const Vector3d &scale) {
     /*// correct dimensions check
     if(translation.rows() != 3 || translation.cols() != 1 || rotation.rows() != 3 || rotation.cols() != 1 || scale.rows() != 3 || scale.cols() != 1){
         std::string message = "Transform dimensions must be 3x1, check:" +
@@ -54,6 +54,8 @@ void App::GeometricalTransformation::setTransformation(const Vector3d &translati
     translationFinal(0,3) = translation(0);
     translationFinal(1,3) = translation(1);
     translationFinal(2,3) = translation(2);
+
+    Vector3d rotation = rotationInPercentage * 2 * M_PI;
 
     rotationXFinal(1,1) = cos(rotation(0));
     rotationXFinal(1,2) = -sin(rotation(0));

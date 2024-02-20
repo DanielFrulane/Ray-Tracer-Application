@@ -14,8 +14,8 @@ bool App::LightPoint::calculateIllumination(const Vector3d &intersectionPoint, c
                                             const std::shared_ptr<App::ObjectGeneric> &object, Vector3d &color,
                                             double &intensity) {
     // from intersection to source of light
-    Vector3d lightDirection = (m_location - intersectionPoint).normalized();
-    double lightDistance = (m_location - intersectionPoint).norm();
+    Vector3d lightDirection = (m_position - intersectionPoint).normalized();
+    double lightDistance = (m_position - intersectionPoint).norm();
     Vector3d sourceFromIntersection = intersectionPoint;
     Ray lightRay (sourceFromIntersection, sourceFromIntersection + lightDirection);
 

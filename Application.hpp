@@ -5,8 +5,10 @@
 #include "dependencies/RTImage.hpp"
 #include "dependencies/scenes/SceneGeneric.hpp"
 #include "dependencies/scenes/SceneBasic.hpp"
+#include "dependencies/scenes/SceneFromJson.hpp"
 #include "dependencies/Camera.hpp"
 #include "dependencies/TileInformation.hpp"
+#include "include/opencv2/opencv.hpp"
 #include <thread>
 #include <atomic>
 
@@ -36,7 +38,7 @@ private:
     std::vector<std::atomic<int>*> m_tileFlags;
 
 public:
-    App::SceneBasic m_scene = App::SceneBasic(); ////////////// TODO ANY SCENE
+    App::SceneGeneric m_scene = App::SceneBasic(); ////////////// TODO ANY SCENE
     // mainly SDL related functions
     Application();
     int inExecution();

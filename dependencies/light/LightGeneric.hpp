@@ -12,7 +12,7 @@ namespace App {
     class LightGeneric {
     public:
         Vector3d m_color;
-        Vector3d m_location;
+        Vector3d m_position;
         double m_intensity;
 
         LightGeneric();

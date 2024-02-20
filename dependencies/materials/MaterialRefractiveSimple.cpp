@@ -63,7 +63,7 @@ Vector3d App::MaterialRefractiveSimple::calculateSpecularColor(const std::vector
         double intensity = 0.0;
 
         // Construct a vector pointing from the intersection point to the light.
-        Vector3d lightDir = (currentLight->m_location - intersectionPoint).normalized();
+        Vector3d lightDir = (currentLight->m_position - intersectionPoint).normalized();
 
         // Compute a start point.
         Vector3d startPoint = intersectionPoint + (lightDir * 0.001);

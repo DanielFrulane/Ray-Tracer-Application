@@ -6,7 +6,7 @@
 namespace App {
     class MaterialRefractiveSimple : public MaterialGeneric{
     public:
-        Vector3d m_color = {1.0,1.0,1.0};
+        Vector3d m_color = {0.0,0.0,0.0};
         double m_reflectivity = 0.0;
         double m_shininess = 0.0;
         double m_translucency = 0.0;

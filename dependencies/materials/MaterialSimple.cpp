@@ -49,7 +49,7 @@ Vector3d App::MaterialSimple::calculateSpecularColor(const std::vector<std::shar
 
     for(const std::shared_ptr<LightGeneric>& currentLight : lightList){
         double intensity = 0.0;
-        Vector3d lightDirection = (currentLight->m_location - intersectionPoint).normalized();
+        Vector3d lightDirection = (currentLight->m_position - intersectionPoint).normalized();
         Vector3d startPoint = intersectionPoint + (lightDirection * 0.001);
         Ray ray = Ray(startPoint, startPoint + lightDirection);
 

@@ -1,5 +1,5 @@
 {
   "type": "light",
   "position": {"x": 0, "y": -10,"z": -5},
-  "color": {"x": 0.4, "y": 0.4,"z": 1}
+  "color": {"red": 0.4, "green": 0.4,"blue": 1}
 }

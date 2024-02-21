@@ -16,8 +16,7 @@ namespace App {
     public:
         inline static int m_maximumNumberOfReflections;
         inline static int m_currentNumberOfReflections;
-        std::vector<std::shared_ptr<Textures::TextureGeneric>> m_textures;
-        bool m_hasTexture = false;
+        std::shared_ptr<Textures::TextureGeneric> m_texture = nullptr;
     public:
         MaterialGeneric();
         virtual ~MaterialGeneric();

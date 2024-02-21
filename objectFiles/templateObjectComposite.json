@@ -1,5 +1,5 @@
 {
-    "type": "objectList",
+    "type": "other",
     "transformation": {
         "translation": {"x": 1, "y": 1,"z": 1},
         "rotation": {"x": 1, "y": 1, "z": 1},

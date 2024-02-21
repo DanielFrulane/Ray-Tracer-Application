@@ -25,8 +25,6 @@ namespace App {
 
         ObjectGeneric();
 
-        explicit ObjectGeneric(const Vector3d &mColor);
-
         virtual ~ObjectGeneric();
 
         void setTransformation(const GeometricalTransformation &transformation);
@@ -40,14 +38,11 @@ namespace App {
 
         void calculateUVSpace(const Vector3d &localPointOfIntersection, Vector2d &uvCoordinates);
 
-        void setColor(const Vector3d &color);
-        const Vector3d &getColor() const;
-
         bool setMaterial(const std::shared_ptr<MaterialGeneric> &material);
 
-        Vector3d m_color;
-        std::shared_ptr<MaterialGeneric> m_material;
-        bool m_hasMaterial = false;
+        //Vector3d m_color;
+        std::shared_ptr<MaterialGeneric> m_material = nullptr;
+        bool m_hasMaterial = false; //// TODO REMOVE
         Vector2d m_uvCoordinates;
         bool m_isVisible = true;
         int m_uvMapType = uvSPHERE; // default

@@ -1,19 +1,18 @@
-#ifndef RAY_TRACER_APPLICATION_MATERIALREFRACTIVESIMPLE_HPP
-#define RAY_TRACER_APPLICATION_MATERIALREFRACTIVESIMPLE_HPP
+#ifndef RAY_TRACER_APPLICATION_MATERIALCOMPLETESIMPLE_HPP
+#define RAY_TRACER_APPLICATION_MATERIALCOMPLETESIMPLE_HPP
 
 #include "MaterialGeneric.hpp"
 
 namespace App {
-    class MaterialRefractiveSimple : public MaterialGeneric{
+    class MaterialCompleteSimple : public MaterialGeneric{
     public:
-        Vector3d m_color = {0.0,0.0,0.0};
         double m_reflectivity = 0.0;
         double m_shininess = 0.0;
         double m_translucency = 0.0;
         double m_indexOfRefraction = 0.0;
 
-        MaterialRefractiveSimple();
-        ~MaterialRefractiveSimple();
+        MaterialCompleteSimple();
+        ~MaterialCompleteSimple();
 
         virtual Vector3d calculateColor(const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
                                         const std::vector<std::shared_ptr<LightGeneric>> &lightList,
@@ -34,4 +33,4 @@ namespace App {
                                 const Ray &cameraRay);
     };
 }
-#endif //RAY_TRACER_APPLICATION_MATERIALREFRACTIVESIMPLE_HPP
+#endif //RAY_TRACER_APPLICATION_MATERIALCOMPLETESIMPLE_HPP

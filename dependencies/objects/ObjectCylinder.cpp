@@ -123,7 +123,6 @@ bool App::ObjectCylinder::isIntersecting(const App::Ray &rayCasted, HitInformati
         //newNormal = m_transformation.applyTransformation(originalNormal, FORWARD_TRANSFORMATION) - globalOrigin;
         //newNormal.normalize();
         //localNormal = newNormal;
-        hitInformation.color = m_color;
         hitInformation.hitObject = this -> shared_from_this();
 
         double x = validPointOfIntersection(0);
@@ -157,7 +156,6 @@ bool App::ObjectCylinder::isIntersecting(const App::Ray &rayCasted, HitInformati
                 //localNormal.normalize();
 
                 // Return the base color.
-                hitInformation.color = m_color;
                 hitInformation.hitObject = this -> shared_from_this();
 
                 double x = validPointOfIntersection(0);

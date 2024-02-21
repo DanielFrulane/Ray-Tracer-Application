@@ -20,14 +20,6 @@ bool App::ObjectGeneric::isWithinProximityPrecision(const double float1, const d
     return fabs(float1-float2) < PRECISION_CONSTANT;
 }
 
-const Vector3d &App::ObjectGeneric::getColor() const {
-    return m_color;
-}
-
-void App::ObjectGeneric::setColor(const Vector3d &color) {
-    m_color = color;
-}
-
 void App::ObjectGeneric::setTransformation(const App::GeometricalTransformation &transformation) {
     m_transformation = transformation;
 }

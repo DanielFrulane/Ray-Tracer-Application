@@ -38,7 +38,7 @@ private:
     std::vector<std::atomic<int>*> m_tileFlags;
 
 public:
-    App::SceneGeneric m_scene = App::SceneBasic(); ////////////// TODO ANY SCENE
+    App::SceneGeneric m_scene = App::SceneFromJSON(); ////////////// TODO ANY SCENE
     // mainly SDL related functions
     Application();
     int inExecution();

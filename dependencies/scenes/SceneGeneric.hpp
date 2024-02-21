@@ -6,8 +6,7 @@
 #include "../RTImage.hpp"
 #include "../Camera.hpp"
 #include "../materials/MaterialGeneric.hpp"
-#include "../materials/MaterialSimple.hpp"
-#include "../materials/MaterialRefractiveSimple.hpp"
+#include "../materials/MaterialCompleteSimple.hpp"
 #include "../objects/ObjectSphere.hpp"
 #include "../objects/ObjectPlane.hpp"
 #include "../objects/ObjectCylinder.hpp"
@@ -33,6 +32,9 @@ namespace App {
 
     public:
         explicit SceneGeneric(double aspectRatio);
+        void checkIfHasAllNecessaryComponents();
+
+        bool m_hasCamera = false;
 
         SceneGeneric();
         virtual ~SceneGeneric();

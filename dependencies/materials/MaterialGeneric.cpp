@@ -66,11 +66,11 @@ Vector3d App::MaterialGeneric::calculateReflectionColor(const std::vector<std::s
     if (isIntersectionFound && (m_currentNumberOfReflections < m_maximumNumberOfReflections)){
         m_currentNumberOfReflections++;
 
-        if (closestHitInformation.hitObject -> m_hasMaterial){
+        //if (closestHitInformation.hitObject -> m_hasMaterial){
             materialColor = closestHitInformation.hitObject -> m_material -> calculateColor(objectList, lightList, closestHitInformation.hitObject, closestHitInformation.pointOfIntersection, closestHitInformation.normal, closestHitInformation.localPointOfIntersection, closestHitInformation.uvCoordinates, reflectionRay); ///// TODO outros param
-        } else {
-            materialColor = calculateDiffuseColor(objectList, lightList, closestHitInformation.hitObject, closestHitInformation.pointOfIntersection, closestHitInformation.normal, closestObject->m_color);
-        }
+        //} else {
+            //materialColor = calculateDiffuseColor(objectList, lightList, closestHitInformation.hitObject, closestHitInformation.pointOfIntersection, closestHitInformation.normal, closestObject->m_color);
+        //}
     }
     else
     {
@@ -107,6 +107,7 @@ bool App::MaterialGeneric::castRay(const App::Ray &castRay, const std::vector<st
 }
 
 void App::MaterialGeneric::setTexture(const std::shared_ptr<Textures::TextureGeneric> &newTexture) {
-    m_textures.push_back(newTexture);
-    m_hasTexture = true;
+    if (m_texture == nullptr){
+        m_texture = newTexture;
+    }
 }

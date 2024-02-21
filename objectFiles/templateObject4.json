@@ -1,20 +1,27 @@
 {
-    "type": "plane",
+    "type": "cuboid",
     "transformation": {
-        "translation": {"x": 1, "y": 1,"z": 1},
-        "rotation": {"x": 1, "y": 1, "z": 1},
-        "scale": {"x": 1,"y": 1,"z": 1}
+        "translation": {"x": 0, "y": -6, "z": 0},
+        "rotation": {"x": 0.125, "y": 0.125, "z": 0.125},
+        "scale": {"x": 2,"y": 1.5,"z": 0.5}
     },
     "material": {
-        "type": "basic",
-        "color": {"red":1, "green":1, "blue":1},
-        "reflectivity": 0.3,
-        "shininess": 0.3,
-        "translucency": 0.75,
-        "indexOfRefraction": 1.333,
+        "reflectivity": 0.05,
+        "shininess": 0,
+        "translucency": 0,
+        "indexOfRefraction": 0,
         "texture": {
-            "type": "flat",
-            "color": {"red":1, "green":1, "blue":1}
+            "type": "gradient",
+            "stops": [{
+                "position": 0,
+                "color": {"red":1, "green":0.75, "blue":0}
+            },{
+                "position": 0.5,
+                "color": {"red":0.25, "green":0.25, "blue":0.25}
+            },{
+                "position": 1,
+                "color": {"red":1, "green":0, "blue":0}
+            }]
         }
     }
 }

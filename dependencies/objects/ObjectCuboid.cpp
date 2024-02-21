@@ -151,7 +151,6 @@ bool App::ObjectCuboid::isIntersecting(const App::Ray &rayCasted, HitInformation
         hitInformation.normal.normalize();
 
         // Return the base color.
-        hitInformation.color = m_color;
 
         //calculateUVSpace(pointOfIntersection,m_uvCoordinates);
         //hitInformation.uvCoordinates = m_uvCoordinates;

@@ -21,7 +21,6 @@ bool App::ObjectSphere::isIntersecting(const App::Ray &rayCasted, HitInformation
     Vector3d vOrientation = backwardRay.m_orientation;
     vOrientation.normalize();
 
-    // a = 1.0
     double b = 2.0 * (backwardRay.m_point1).dot(vOrientation);
     double c = (backwardRay.m_point1).dot(backwardRay.m_point1) - 1.0;
 
@@ -69,7 +68,6 @@ bool App::ObjectSphere::isIntersecting(const App::Ray &rayCasted, HitInformation
             hitInformation.normal = m_transformation.applyNorm(normalVector);
             hitInformation.normal.normalize();
 
-            hitInformation.color = m_color;
             hitInformation.hitObject = this -> shared_from_this();
             calculateUVSpace(pointLocal, hitInformation.uvCoordinates);
             hitInformation.localPointOfIntersection = pointLocal;

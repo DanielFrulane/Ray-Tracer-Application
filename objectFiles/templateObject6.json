@@ -1,20 +1,18 @@
 {
-    "type": "sphere",
+    "type": "cone",
     "transformation": {
-        "translation": {"x": 1, "y": 1,"z": 1},
-        "rotation": {"x": 1, "y": 1, "z": 1},
-        "scale": {"x": 3,"y": 4,"z": 5}
+        "translation": {"x": -2, "y": -5,"z": 0},
+        "rotation": {"x": 0, "y": 0, "z": 0},
+        "scale": {"x": 1,"y": 1,"z": 2}
     },
     "material": {
-        "type": "basic",
-        "color": {"red":1, "green":1, "blue":1},
         "reflectivity": 0.3,
-        "shininess": 0.3,
-        "translucency": 0.75,
-        "indexOfRefraction": 1.333,
+        "shininess": 32,
+        "translucency": 0,
+        "indexOfRefraction": 0,
         "texture": {
             "type": "flat",
-            "color": {"red":1, "green":1, "blue":1}
+            "color": {"red":1, "green":0, "blue":0}
         }
     }
 }

@@ -236,14 +236,14 @@ Vector3d App::SceneGeneric::renderPixel(int x, int y, int width, int height) {
     bool intersectionFound = castRay(cameraRay, closestObject, hitInformation);
     Vector3d color;
     if (intersectionFound){
-        if (hitInformation.hitObject->m_hasMaterial){
+        //if (hitInformation.hitObject->m_hasMaterial){
             // color from material
             MaterialGeneric::m_currentNumberOfReflections = 0;
             color = hitInformation.hitObject->m_material->calculateColor(m_objectsInScene, m_lightsInScene, hitInformation.hitObject, hitInformation.pointOfIntersection, hitInformation.normal, hitInformation.localPointOfIntersection, hitInformation.uvCoordinates, cameraRay);
-        } else {
+        //} else {
             // basic color calculation
-            color = MaterialGeneric::calculateDiffuseColor(m_objectsInScene, m_lightsInScene, hitInformation.hitObject, hitInformation.pointOfIntersection, hitInformation.normal, closestObject->m_color);
-        }
+            //color = MaterialGeneric::calculateDiffuseColor(m_objectsInScene, m_lightsInScene, hitInformation.hitObject, hitInformation.pointOfIntersection, hitInformation.normal, closestObject->m_color);
+        //}
     }else{
         color = {0.0,0.0,0.0};
     }
@@ -255,4 +255,28 @@ int App::SceneGeneric::convertCoordinatesToLinearIndex(int x, int y, int width, 
         return (y*width) + x;
     }
     return -1;
+}
+
+void App::SceneGeneric::checkIfHasAllNecessaryComponents() {
+    if (!m_hasCamera){
+        std::cout<<"camera not configured"<<std::endl;
+        return;
+    }
+    if (m_lightsInScene.empty()){
+        std::cout<<"no lights in scene"<<std::endl;
+        return;
+    }
+    if (m_objectsInScene.empty()){
+        std::cout<<"no objects in scene"<<std::endl;
+        return;
+    }
+    for (const std::shared_ptr<ObjectGeneric>& currentObject : m_objectsInScene){
+        if (currentObject->m_material == nullptr){
+            std::cout<<"no material in object"<<std::endl;
+        } else {
+            if (currentObject->m_material->m_texture == nullptr){
+                std::cout<<"no texture in material"<<std::endl;
+            }
+        }
+    }
 }

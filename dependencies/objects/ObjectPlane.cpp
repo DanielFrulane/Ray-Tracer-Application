@@ -17,7 +17,7 @@ bool App::ObjectPlane::isIntersecting(const App::Ray &rayCasted, HitInformation 
     Ray backward = m_transformation.applyTransformation(rayCasted, BACKWARD_TRANSFORMATION);
 
     Vector3d orientation = backward.m_orientation;
-    orientation.normalize();
+    //orientation.normalize();
 
     if (!isWithinProximityPrecision(orientation(2), 0.0)){
         // there is an intersection
@@ -40,7 +40,6 @@ bool App::ObjectPlane::isIntersecting(const App::Ray &rayCasted, HitInformation 
                 hitInformation.normal = m_transformation.applyNorm(normalVector);
                 hitInformation.normal.normalize();
 
-                hitInformation.color = m_color;
                 hitInformation.hitObject = this -> shared_from_this();
                 //calculateUVSpace(intersectionLocal, hitInformation.uvCoordinates);
                 hitInformation.localPointOfIntersection = intersectionLocal;

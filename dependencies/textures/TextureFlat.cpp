@@ -4,9 +4,7 @@ App::Textures::TextureFlat::TextureFlat() {
     m_color = {1.0,1.0,1.0};
 }
 
-App::Textures::TextureFlat::~TextureFlat() {
-
-}
+App::Textures::TextureFlat::~TextureFlat() = default;
 
 Vector3d App::Textures::TextureFlat::getColor(const Vector2d &uvCoordinates) {
     return m_color;

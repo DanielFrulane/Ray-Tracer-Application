@@ -7,7 +7,7 @@
     },
     "material": {
         "reflectivity": 0.3,
-        "shininess": 32,
+        "shininess": 64,
         "translucency": 0,
         "indexOfRefraction": 0,
         "texture": {

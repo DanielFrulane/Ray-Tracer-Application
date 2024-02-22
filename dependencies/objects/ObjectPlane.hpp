@@ -7,9 +7,8 @@ namespace App {
     class ObjectPlane : public ObjectGeneric, public std::enable_shared_from_this<ObjectPlane> {
     public:
         ObjectPlane();
-        virtual ~ObjectPlane() override;
-        virtual bool isIntersecting(const App::Ray &rayCasted, HitInformation &hitInformation) override;
-
+        ~ObjectPlane() override;
+        bool isIntersecting(const App::Ray &rayCasted, HitInformation &hitInformation) override;
     };
 }
 

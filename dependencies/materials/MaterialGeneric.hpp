@@ -21,6 +21,13 @@ namespace App {
         MaterialGeneric();
         virtual ~MaterialGeneric();
 
+        void setTexture(const std::shared_ptr<Textures::TextureGeneric> &newTexture);
+
+        static bool castRay(const Ray &castRay, const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
+                            const std::shared_ptr<ObjectGeneric> &thisObject,
+                            std::shared_ptr<ObjectGeneric> &closestObject,
+                            HitInformation &closestHitInformation);
+
         virtual Vector3d calculateColor(const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
                                         const std::vector<std::shared_ptr<LightGeneric>> &lightList,
                                         const std::shared_ptr<ObjectGeneric> &currentObject,
@@ -34,18 +41,11 @@ namespace App {
                                               const Vector3d &intersectionPoint, const Vector3d &localNormal,
                                               const Vector3d &color);
 
-        Vector3d calculateReflectionColor(const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
+        static Vector3d calculateReflectionColor(const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
                                           const std::vector<std::shared_ptr<LightGeneric>> &lightList,
                                           const std::shared_ptr<ObjectGeneric> &currentObject,
                                           const Vector3d &intersectionPoint, const Vector3d &localNormal,
                                           const Ray &incidentRay);
-
-        bool castRay(const Ray &castRay, const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
-                     const std::shared_ptr<ObjectGeneric> &thisObject,
-                     std::shared_ptr<ObjectGeneric> &closestObject,
-                     HitInformation &closestHitInformation);
-
-        void setTexture(const std::shared_ptr<Textures::TextureGeneric> &newTexture);
     };
 }
 

@@ -6,15 +6,15 @@
 namespace App {
     class MaterialCompleteSimple : public MaterialGeneric{
     public:
-        double m_reflectivity = 0.0;
-        double m_shininess = 0.0;
-        double m_translucency = 0.0;
-        double m_indexOfRefraction = 0.0;
+        double m_reflectivity;
+        double m_shininess;
+        double m_translucency;
+        double m_indexOfRefraction;
 
         MaterialCompleteSimple();
-        ~MaterialCompleteSimple();
+        ~MaterialCompleteSimple() override;
 
-        virtual Vector3d calculateColor(const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
+        Vector3d calculateColor(const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
                                         const std::vector<std::shared_ptr<LightGeneric>> &lightList,
                                         const std::shared_ptr<ObjectGeneric> &currentObject,
                                         const Vector3d &intersectionPoint, const Vector3d &localNormal,
@@ -24,13 +24,13 @@ namespace App {
         Vector3d calculateSpecularColor(const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
                                 const std::vector<std::shared_ptr<LightGeneric>> &lightList,
                                 const Vector3d &intersectionPoint, const Vector3d &localNormal,
-                                const Ray &cameraRay);
+                                const Ray &cameraRay) const;
 
         Vector3d calculateTranslucency(const std::vector<std::shared_ptr<ObjectGeneric>> &objectList,
                                 const std::vector<std::shared_ptr<LightGeneric>> &lightList,
                                 const std::shared_ptr<ObjectGeneric> &currentObject,
                                 const Vector3d &intersectionPoint, const Vector3d &localNormal,
-                                const Ray &cameraRay);
+                                const Ray &cameraRay) const;
     };
 }
 #endif //RAY_TRACER_APPLICATION_MATERIALCOMPLETESIMPLE_HPP

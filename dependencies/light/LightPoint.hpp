@@ -9,12 +9,12 @@ namespace App {
     class LightPoint : public App::LightGeneric {
     public:
         LightPoint();
-        virtual ~LightPoint() override;
+        ~LightPoint() override;
 
-        virtual bool calculateIllumination(const Vector3d &intersectionPoint, const Vector3d &localNormal,
+        bool calculateIllumination(const Vector3d &intersectionPoint, const Vector3d &localNormal,
                                            const std::vector<std::shared_ptr<App::ObjectGeneric>> &objectsInScene,
                                            const std::shared_ptr<App::ObjectGeneric> &object,
-                                           Vector3d &color, double &intensity);
+                                           Vector3d &color, double &intensity) override;
     };
 }
 

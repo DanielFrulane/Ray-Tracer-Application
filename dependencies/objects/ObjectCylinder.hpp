@@ -7,9 +7,9 @@ namespace App {
     class ObjectCylinder : public ObjectGeneric, public std::enable_shared_from_this<ObjectCylinder> {
     public:
         ObjectCylinder();
-        virtual ~ObjectCylinder();
+        ~ObjectCylinder() override;
 
-        virtual bool isIntersecting(const Ray &rayCasted, HitInformation &hitInformation) override;
+        bool isIntersecting(const Ray &rayCasted, HitInformation &hitInformation) override;
     };
 }
 

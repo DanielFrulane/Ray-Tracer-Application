@@ -9,16 +9,20 @@ using namespace Eigen;
 namespace App {
     class Camera {
     private:
-        // see the documentation for the visual explanation of each vector
         Vector3d m_position;
         Vector3d m_lookAt;
-        Vector3d m_up;
+        Vector3d m_up; // what is perceived as "up" in the scene
+        Vector3d m_alignmentVector; // orientation
+        Vector3d m_screenCenter;
+        Vector3d m_u, m_v;
+        // defining the display resolution
         double m_length, m_horizontalSize, m_aspectRatio;
-
-        Vector3d m_alignmentVector, m_u, m_v, m_screenCenter;
 
     public:
         Camera();
+
+        bool generateRay(double projectionScreenX, double projectionScreenY, Ray &parameterRay);
+        void updateStatus();
 
         void setPosition(const Vector3d &newPosition);
         void setLookAt(const Vector3d &newLookAt);
@@ -33,12 +37,9 @@ namespace App {
         Vector3d getU();
         Vector3d getV();
         Vector3d getScreenCenter();
-        double getLength();
-        double getHorizontalSize();
-        double getAspectRatio();
-
-        bool generateRay(double projectionScreenX, double projectionScreenY, Ray &parameterRay);
-        void updateStatus();
+        double getLength() const;
+        double getHorizontalSize() const;
+        double getAspectRatio() const;
     };
 }
 

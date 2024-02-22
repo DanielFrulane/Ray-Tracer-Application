@@ -5,10 +5,9 @@ App::LightPoint::LightPoint() {
     m_intensity = 1.0;
 }
 
-App::LightPoint::~LightPoint() {
+App::LightPoint::~LightPoint() = default;
 
-}
-
+// calculates how the light impacts the color of a certain object
 bool App::LightPoint::calculateIllumination(const Vector3d &intersectionPoint, const Vector3d &localNormal,
                                             const std::vector<std::shared_ptr<App::ObjectGeneric>> &objectsInScene,
                                             const std::shared_ptr<App::ObjectGeneric> &object, Vector3d &color,
@@ -16,20 +15,17 @@ bool App::LightPoint::calculateIllumination(const Vector3d &intersectionPoint, c
     // from intersection to source of light
     Vector3d lightDirection = (m_position - intersectionPoint).normalized();
     double lightDistance = (m_position - intersectionPoint).norm();
-    Vector3d sourceFromIntersection = intersectionPoint;
-    Ray lightRay (sourceFromIntersection, sourceFromIntersection + lightDirection);
+    Ray lightRay (intersectionPoint, intersectionPoint + lightDirection);
 
-    //Vector3d pointOfIntersection;
-    //Vector3d pointOfIntersectionNormal;
-    //Vector3d pointOfIntersectionColor;
     HitInformation hitInformation;
     bool isValidIntersection = false;
+    // testing objects in scene until finding an intersection
     for(const std::shared_ptr<ObjectGeneric>& objectOther: objectsInScene){
         if (object != objectOther){
             isValidIntersection = objectOther ->isIntersecting(lightRay, hitInformation);
             if(isValidIntersection){
                 // checks if the light is between the two objects (then, no shadow needed)
-                double distance = (hitInformation.pointOfIntersection - sourceFromIntersection).norm();
+                double distance = (hitInformation.pointOfIntersection - intersectionPoint).norm();
                 if (distance > lightDistance){
                     isValidIntersection = false;
                 }
@@ -44,20 +40,19 @@ bool App::LightPoint::calculateIllumination(const Vector3d &intersectionPoint, c
     if (!isValidIntersection){
         // no shadow (no intersection with light ray)
         double angleToLight = acos(localNormal.dot(lightDirection));
-        if (angleToLight > 1.5708){  // pi/2
+        if (angleToLight > (M_PI/2)){
             color = m_color; // dark
             intensity = 0.0;
             return false;
         } else {
             color = m_color; // colored
-            intensity = m_intensity * (1.0 - (angleToLight / 1.5708));
+            intensity = m_intensity * (1.0 - (angleToLight / (M_PI/2)));
             return true;
         }
     }
     else {
         color = m_color;
-        intensity = 0.0;
+        intensity = 0.0; // dark
         return false;
     }
-    return true;
 }

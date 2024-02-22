@@ -2,7 +2,6 @@
 #define APPLICATION_H
 
 #include "include/SDL2/SDL.h"
-#include "dependencies/RTImage.hpp"
 #include "dependencies/scenes/SceneGeneric.hpp"
 #include "dependencies/scenes/SceneBasic.hpp"
 #include "dependencies/scenes/SceneFromJson.hpp"
@@ -12,34 +11,38 @@
 #include <thread>
 #include <atomic>
 
+// the application responsible for all functionalities
 
 class Application{
 private:
-    // mainly SDL related functions
+    // mainly SDL related functions for rendering and showing the image
+    App::SceneGeneric m_scene;
     bool isRunning;
     SDL_Window *pWindow;
     SDL_Renderer *pRenderer;
-    App::RTImage m_image; // image to be rendered
-    int m_numberOfTilesInWidth, m_numberOfTilesInHeight;
     int m_width, m_height;
-    void convertImageToTexture(App::TileInformation &tile);
-    Uint32 convertColor(const double r, const double g, const double b);
-    double m_maxGammaLevel = 1.0;
 
+    // Convert colors ranged from 0 to 1 to unsigned integers for SDL interpretation
+    Uint32 convertColor(const double r, const double g, const double b);
+    double m_maxGammaLevel; // for gamma correction
+
+    // threaded initialization of tiles
+    int m_numberOfTilesInWidth, m_numberOfTilesInHeight;
+    void convertImageToTexture(App::TileInformation &tile);
     bool generateTileGrid(int tileWidth, int tileHeight);
     bool destroyTileGrid();
     void resetTileFlags();
 
-    int m_maxThreads = 8;
-    int m_currentNumberOfThreads = 0;
-    std::vector<std::thread> m_threads;
+    // thread support
+    int m_maxThreads;
+    int m_currentNumberOfThreads;
     std::atomic<int> *m_threadCounter;
+    std::vector<std::thread> m_threads;
     std::vector<App::TileInformation> m_tiles;
-    std::vector<std::atomic<int>*> m_tileFlags;
+    std::vector<std::atomic<int>*> m_tileFlags; // not rendered, rendered, rendering
 
 public:
-    App::SceneGeneric m_scene = App::SceneFromJSON(); ////////////// TODO ANY SCENE
-    // mainly SDL related functions
+    // mainly SDL related functions for rendering and showing the image
     Application();
     int inExecution();
     bool inInitialization();
@@ -47,6 +50,8 @@ public:
     void inLoop();
     void inRender();
     void inExit();
+
+    // threaded initialization of tiles
     void renderTile(App::TileInformation *tile, std::atomic<int> *threadCounter, std::atomic<int> *tileFlag);
 };
 

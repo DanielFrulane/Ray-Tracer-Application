@@ -10,42 +10,33 @@ namespace App {
     // forward-declaring a class to be overwritten in order to avoid redundant import errors
     class MaterialGeneric;
     
-    // Define constants for UV mapping types.
-    constexpr int uvSPHERE = 0; // TODO use?
+    // constants for UV mapping
+    constexpr int uvSPHERE = 0;
     constexpr int uvPLANE = 1;
     constexpr int uvCYLINDER = 2;
     constexpr int uvCUBOID = 3;
 
     class ObjectGeneric {
     public:
-        GeometricalTransformation m_boundingBoxTransformation;
-        double m_boundingBoxPadding = 0.0;
+        std::shared_ptr<MaterialGeneric> m_material = nullptr;
+        Vector2d m_uvCoordinates;
+        int m_uvMapType = uvSPHERE; // default
 
+        GeometricalTransformation m_boundingBoxTransformation;
         GeometricalTransformation m_transformation;
 
         ObjectGeneric();
-
         virtual ~ObjectGeneric();
 
         void setTransformation(const GeometricalTransformation &transformation);
+        void setMaterial(const std::shared_ptr<MaterialGeneric> &material);
 
         virtual bool isIntersecting(const Ray &rayCasted, HitInformation &hitInformation);
-        bool isWithinProximityPrecision(const double float1, const double float2);
+        static bool isWithinProximityPrecision(double float1, double float2);
+        void calculateUVSpace(const Vector3d &localPointOfIntersection, Vector2d &uvCoordinates) const;
 
         virtual void getExtents(Vector2d &xLim, Vector2d &yLim, Vector2d &zLim);
-        virtual void getExtents(const GeometricalTransformation &parentTransformationMatrix, Vector3d &xLim, Vector3d &yLim, Vector3d &zLim);
-        std::vector<Vector3d> getCuboid(double xMin, double xMax, double yMin, double yMax, double zMin, double zMax);
-
-        void calculateUVSpace(const Vector3d &localPointOfIntersection, Vector2d &uvCoordinates);
-
-        bool setMaterial(const std::shared_ptr<MaterialGeneric> &material);
-
-        //Vector3d m_color;
-        std::shared_ptr<MaterialGeneric> m_material = nullptr;
-        bool m_hasMaterial = false; //// TODO REMOVE
-        Vector2d m_uvCoordinates;
-        bool m_isVisible = true;
-        int m_uvMapType = uvSPHERE; // default
+        static std::vector<Vector3d> getCuboid(double xMin, double xMax, double yMin, double yMax, double zMin, double zMax) ;
     };
 }
 

@@ -5,17 +5,18 @@
 #include "../include/Eigen/Eigen"
 #include "../include/SDL2/SDL.h"
 
+// holds general information for the rendering of tiles
+
 using namespace Eigen;
 
 namespace App {
-    class ObjectGeneric;
+    class ObjectGeneric; // predefining ObjectGeneric class
 
     struct TileInformation {
         int x;
         int y;
         int width;
         int height;
-        int renderComplete = 0;
         bool textureComplete = false;
         SDL_Texture *pTexture;
         std::vector<Vector3d> rgb;

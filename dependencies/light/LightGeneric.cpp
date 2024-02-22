@@ -1,12 +1,8 @@
 #include "LightGeneric.hpp"
 
-App::LightGeneric::LightGeneric() {
+App::LightGeneric::LightGeneric() = default;
 
-}
-
-App::LightGeneric::~LightGeneric() {
-
-}
+App::LightGeneric::~LightGeneric() = default;
 
 bool App::LightGeneric::calculateIllumination(const Vector3d &intersectionPoint, const Vector3d &localNormal,
                                               const std::vector<std::shared_ptr<App::ObjectGeneric>> &objectsInScene,

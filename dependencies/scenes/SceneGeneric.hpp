@@ -1,9 +1,7 @@
 #ifndef RAY_TRACER_APPLICATION_SCENEGENERIC_HPP
 #define RAY_TRACER_APPLICATION_SCENEGENERIC_HPP
 
-#include <vector>
 #include "../../include/SDL2/SDL.h"
-#include "../RTImage.hpp"
 #include "../Camera.hpp"
 #include "../materials/MaterialGeneric.hpp"
 #include "../materials/MaterialCompleteSimple.hpp"
@@ -21,33 +19,29 @@
 #include "../HitInformation.hpp"
 #include "../TileInformation.hpp"
 #include <memory>
+#include <vector>
 
 namespace App {
     class SceneGeneric{
     public:
         Camera m_camera;
+        bool m_hasCamera = false;
+        int m_width, m_height;
         std::vector<std::shared_ptr<ObjectGeneric>> m_objectsInScene;
         std::vector<std::shared_ptr<LightGeneric>> m_lightsInScene;
-        int m_width, m_height;
 
-    public:
-        explicit SceneGeneric(double aspectRatio);
         void checkIfHasAllNecessaryComponents();
-
-        bool m_hasCamera = false;
 
         SceneGeneric();
         virtual ~SceneGeneric();
 
-        bool render(RTImage &outputImage);
-        void renderTile(App::TileInformation *tile);
         virtual void generateSceneObjects();
-
+        void renderTile(App::TileInformation *tile);
         bool castRay(Ray &castedRay, std::shared_ptr<ObjectGeneric> &closestObject, HitInformation &closestHitInformation);
 
     private:
         Vector3d renderPixel(int x, int y, int width, int height);
-        int convertCoordinatesToLinearIndex(int x, int y, int width, int height);
+        static int convertCoordinatesToLinearIndex(int x, int y, int width, int height);
     };
 }
 

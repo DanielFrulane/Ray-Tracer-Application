@@ -5,6 +5,8 @@
 #include "../Ray.hpp"
 #include <string>
 
+// transformation 3D -> 3D to be applied in objects for translation, rotation and scale
+
 namespace App {
     // flags
     constexpr bool FORWARD_TRANSFORMATION = true;
@@ -31,15 +33,11 @@ namespace App {
 
         Ray applyTransformation(const Ray &rayInput, bool isForwardTransformation);
         Vector3d applyTransformation(const Vector3d &vectorInput, bool isForwardTransformation);
-
         Vector3d applyNorm(const Vector3d &inputVector);
-        Matrix3d  getNormalTransformation();
 
-        friend GeometricalTransformation operator* (const GeometricalTransformation& leftHandSide, const GeometricalTransformation& rightHandSide);
-
-        GeometricalTransformation operator= (const GeometricalTransformation &rightHandSide);
-
-        void printMatrix(bool isForwardTransformation);
+        // operator overriding
+        friend GeometricalTransformation operator* (const GeometricalTransformation& leftSide, const GeometricalTransformation& rightSide);
+        GeometricalTransformation operator= (const GeometricalTransformation &rightSide);
     };
 }
 

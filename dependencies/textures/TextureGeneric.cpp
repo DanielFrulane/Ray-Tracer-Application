@@ -1,19 +1,15 @@
 #include "TextureGeneric.hpp"
 #include <cmath>
-#include <iostream>
 
-App::Textures::TextureGeneric::TextureGeneric() {
+App::Textures::TextureGeneric::TextureGeneric() = default;
 
-}
-
-App::Textures::TextureGeneric::~TextureGeneric() {
-
-}
+App::Textures::TextureGeneric::~TextureGeneric() = default;
 
 Vector3d App::Textures::TextureGeneric::getColor(const Vector2d &uvCoordinates) {
     return {};
 }
 
+// sets the UV transformation (2D) to be applied when calculating the correct placement of colors
 void App::Textures::TextureGeneric::setTransformation(const Vector2d &translation, const double &rotationInPercentage,
                                                       const Vector2d &scale) {
 
@@ -34,11 +30,9 @@ void App::Textures::TextureGeneric::setTransformation(const Vector2d &translatio
     m_transformationMatrix = translationMatrix * rotationMatrix * scaleMatrix;
 }
 
-Vector3d App::Textures::TextureGeneric::blendRGBAColorsToRGB(const std::vector<Vector3d> &inputColorList) {
-    return {};
-}
-
+// transforms a vector to its new UV coordinates
 Vector2d App::Textures::TextureGeneric::applyTransformation(const Vector2d &input) {
+    // turns it into 3D
     Vector3d newInput;
     newInput(0) = input(0);
     newInput(1) = input(1);
@@ -46,6 +40,7 @@ Vector2d App::Textures::TextureGeneric::applyTransformation(const Vector2d &inpu
 
     Vector3d result = m_transformationMatrix * newInput;
 
+    // turns it back into 2D
     Vector2d output;
     output(0) = result(0);
     output(1) = result(1);

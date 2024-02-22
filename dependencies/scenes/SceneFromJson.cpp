@@ -11,14 +11,14 @@
 #define VALUE_TYPE_OBJECT_CONE "cone"
 #define VALUE_TYPE_OBJECT_CUBOID "cuboid"
 #define VALUE_TYPE_OBJECT_COMPOSITION "composition"
-#define VALUE_COMPOSITION_OBJECTS "objects"
+#define VALUE_COMPOSITION_OBJECTS "objectList"
 #define VALUE_POSITION "position"
 #define VALUE_LOOK_AT "lookAt"
 #define VALUE_UP "up"
 #define VALUE_COLOR "color"
 #define VALUE_COLOR1 "color1"
 #define VALUE_COLOR2 "color2"
-#define VALUE_HORIZONTAL_SIZE "horizontalSize"
+#define VALUE_ZOOM_OUT "zoomOut"
 #define VALUE_ASPECT_RATIO "aspectRatio"
 #define VALUE_TRANSFORMATION "transformation"
 #define VALUE_TRANSFORMATION_UV "transformationUV"
@@ -39,14 +39,13 @@
 App::SceneFromJSON::SceneFromJSON() {
     setDirectory();
     generateSceneObjects();
-    //checkIfHasAllNecessaryComponents();
+    checkIfHasAllNecessaryComponents();
     std::cout<<"configured objects: "<<m_objectsInScene.size()<<std::endl;
 }
 
-App::SceneFromJSON::~SceneFromJSON() {
+App::SceneFromJSON::~SceneFromJSON() = default;
 
-}
-
+// reads all .json files to generate objecs
 void App::SceneFromJSON::generateSceneObjects() {
     for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(m_path)) {
         if (std::filesystem::is_regular_file(entry)) {
@@ -58,10 +57,9 @@ void App::SceneFromJSON::generateSceneObjects() {
     }
 }
 
+// finds where the files are
 void App::SceneFromJSON::setDirectory() {
     m_path = std::filesystem::current_path();
-    //m_path = m_path.parent_path().parent_path();
-    //std::cout<<"path "<<m_path<<std::endl;
     m_path = m_path / OBJECT_FOLDER_NAME;
     std::cout<<"path: "<<m_path<<std::endl;
     std::filesystem::current_path(m_path);
@@ -73,17 +71,16 @@ void App::SceneFromJSON::interpretFile(const char* fileName) {
     char readBuffer[50000];
     rapidjson::FileReadStream is(fp, readBuffer,sizeof(readBuffer));
 
-    // Parse the JSON data using a Document object
+    // parse the .json data using a Document object
     rapidjson::Document d;
     d.ParseStream(is);
 
-    // Close the file
     fclose(fp);
-
     interpretJSONType(d);
 }
 
-void App::SceneFromJSON::interpretJSONType(rapidjson::Document& d) {
+// interprets what type of object the file refers to
+void App::SceneFromJSON::interpretJSONType(const rapidjson::Value& d) {
     const char* comparisonString(d[VALUE_TYPE].GetString());
     std::cout<<"type: "<<comparisonString<<std::endl;
 
@@ -96,41 +93,36 @@ void App::SceneFromJSON::interpretJSONType(rapidjson::Document& d) {
         const rapidjson::Value& transformationValue = d[VALUE_TRANSFORMATION];
         GeometricalTransformation myTransformation  = getTransformationFromJSON(transformationValue);
         myComposition->setTransformation(myTransformation);
-
         const rapidjson::Value& objectsValue = d[VALUE_COMPOSITION_OBJECTS];
-        auto objectList = objectsValue[VALUE_COMPOSITION_OBJECTS].GetArray();
-        /*for(rapidjson::Value& objectValue : objectList){
-            //// TODO RECURSIVE
-        }*/
-        //m_objectsInScene.push_back(myComposition);
+        for (rapidjson::Value const& objectValue: objectsValue.GetArray()){
+            std::cout<<"adding object"<<objectValue[VALUE_TYPE].GetString()<<std::endl;
+            std::shared_ptr<ObjectGeneric> myObject = getConcreteJSONObject(objectValue);
+            myComposition->addObject(myObject);
+        }
+        m_objectsInScene.push_back(myComposition);
     } else {
-        std::shared_ptr<ObjectGeneric> myObject = nullptr;
-        myObject = configureConcreteJSONObject(d);
+        std::shared_ptr<ObjectGeneric> myObject = getConcreteJSONObject(d);
         if (myObject != nullptr){
             m_objectsInScene.push_back(myObject);
         }
     }
 }
 
-void App::SceneFromJSON::interpretJSONCamera(rapidjson::Document &d) {
+// interprets a camera file
+void App::SceneFromJSON::interpretJSONCamera(const rapidjson::Value& d) {
     if (m_hasCamera){
         // TODO error throw
     }
     const rapidjson::Value& positionValue = d[VALUE_POSITION];
     const rapidjson::Value& lookAtValue = d[VALUE_LOOK_AT];
     const rapidjson::Value& upValue = d[VALUE_UP];
-    const rapidjson::Value& horizontalSizeValue = d[VALUE_HORIZONTAL_SIZE];
+    const rapidjson::Value& horizontalSizeValue = d[VALUE_ZOOM_OUT];
     const rapidjson::Value& aspectRatioValue = d[VALUE_ASPECT_RATIO];
     Vector3d position = getXYZVector3dFromValue(positionValue);
     Vector3d lookAt = getXYZVector3dFromValue(lookAtValue);
     Vector3d up = getXYZVector3dFromValue(upValue);
     double horizontalSize = horizontalSizeValue.GetDouble();
     double aspectRatio = aspectRatioValue.GetDouble();
-    std::cout << "position: " << position << std::endl;
-    std::cout << "lookat: " << lookAt << std::endl;
-    std::cout << "up: " << up << std::endl;
-    std::cout << "hs: " << horizontalSize << std::endl;
-    std::cout << "ar: " << aspectRatio << std::endl;
 
     m_camera.setPosition(position);
     m_camera.setLookAt(lookAt);
@@ -142,13 +134,12 @@ void App::SceneFromJSON::interpretJSONCamera(rapidjson::Document &d) {
     m_hasCamera = true;
 }
 
-void App::SceneFromJSON::interpretJSONLight(rapidjson::Document &d) {
+// interprets a light file
+void App::SceneFromJSON::interpretJSONLight(const rapidjson::Value& d) {
     const rapidjson::Value& positionValue = d[VALUE_POSITION];
     const rapidjson::Value& colorValue = d[VALUE_COLOR];
     Vector3d position = getXYZVector3dFromValue(positionValue);
     Vector3d color = getRGBVector3dFromValue(colorValue);
-    std::cout << "position: " << position << std::endl;
-    std::cout << "color: " << color << std::endl;
 
     std::shared_ptr<LightPoint> myLight = std::make_shared<LightPoint>(LightPoint());
     myLight -> m_position = position;
@@ -156,6 +147,7 @@ void App::SceneFromJSON::interpretJSONLight(rapidjson::Document &d) {
     m_lightsInScene.push_back(myLight);
 }
 
+// interprets a Vector3d formatted as xyz
 Vector3d App::SceneFromJSON::getXYZVector3dFromValue(const rapidjson::Value &value) {
     double x, y, z;
     x = value["x"].GetDouble();
@@ -164,6 +156,7 @@ Vector3d App::SceneFromJSON::getXYZVector3dFromValue(const rapidjson::Value &val
     return {x,y,z};
 }
 
+// interprets a Vector3d formatted as rgb
 Vector3d App::SceneFromJSON::getRGBVector3dFromValue(const rapidjson::Value &value) {
     double x, y, z;
     x = value["red"].GetDouble();
@@ -172,13 +165,15 @@ Vector3d App::SceneFromJSON::getRGBVector3dFromValue(const rapidjson::Value &val
     return {x,y,z};
 }
 
-Vector2d App::SceneFromJSON::getXYVecto2dFromValue(const rapidjson::Value &value) {
+// interprets a Vector2d formatted as xy
+Vector2d App::SceneFromJSON::getXYVector2dFromValue(const rapidjson::Value &value) {
     double x, y;
     x = value["x"].GetDouble();
     y = value["y"].GetDouble();
     return {x,y};
 }
 
+// interprets a transformation value
 App::GeometricalTransformation App::SceneFromJSON::getTransformationFromJSON(const rapidjson::Value &value) {
     const rapidjson::Value& translationValue = value[VALUE_TRANSLATION];
     const rapidjson::Value& rotationValue = value[VALUE_ROTATION];
@@ -191,8 +186,9 @@ App::GeometricalTransformation App::SceneFromJSON::getTransformationFromJSON(con
     return myTransformation;
 }
 
-std::shared_ptr<App::ObjectGeneric> App::SceneFromJSON::configureConcreteJSONObject(rapidjson::Document &d) {
-    const char* comparisonString(d["type"].GetString());
+// interprets a concrete object (not composition)
+std::shared_ptr<App::ObjectGeneric> App::SceneFromJSON::getConcreteJSONObject(const rapidjson::Value& d) {
+    const char* comparisonString(d[VALUE_TYPE].GetString());
     std::shared_ptr<ObjectGeneric> myObject;
 
     if (strcmp(comparisonString, VALUE_TYPE_OBJECT_SPHERE) == 0) {
@@ -212,7 +208,7 @@ std::shared_ptr<App::ObjectGeneric> App::SceneFromJSON::configureConcreteJSONObj
 
     } else {
         std::cout<<"unrecognized\n";
-        // error throw;
+        // TODO error throw;
         return nullptr;
     }
     const rapidjson::Value& transformationValue = d[VALUE_TRANSFORMATION];
@@ -223,10 +219,10 @@ std::shared_ptr<App::ObjectGeneric> App::SceneFromJSON::configureConcreteJSONObj
     std::shared_ptr<MaterialCompleteSimple> myMaterial = getMaterialFromJSON(materialValue);
     myObject->setMaterial(myMaterial);
 
-    //m_objectsInScene.push_back(myObject);
     return myObject;
 }
 
+// interprets a material value
 std::shared_ptr<App::MaterialCompleteSimple> App::SceneFromJSON::getMaterialFromJSON(const rapidjson::Value &value) {
     std::shared_ptr<MaterialCompleteSimple> myMaterial = std::make_shared<MaterialCompleteSimple>(MaterialCompleteSimple());
 
@@ -246,9 +242,10 @@ std::shared_ptr<App::MaterialCompleteSimple> App::SceneFromJSON::getMaterialFrom
     return myMaterial;
 }
 
+// interprets a texture value
 std::shared_ptr<App::Textures::TextureGeneric> App::SceneFromJSON::getTextureFromJSON(const rapidjson::Value &value) {
     const char* comparisonString(value[VALUE_TYPE].GetString());
-    std::cout<<"type: "<<comparisonString<<std::endl;
+    std::cout<<"texture type: "<<comparisonString<<std::endl;
 
     if (strcmp(comparisonString, VALUE_TYPE_TEXTURE_FLAT) == 0) {
         std::shared_ptr<Textures::TextureFlat> myTexture;
@@ -272,6 +269,7 @@ std::shared_ptr<App::Textures::TextureGeneric> App::SceneFromJSON::getTextureFro
     }
 }
 
+// interprets a texture flat value
 std::shared_ptr<App::Textures::TextureFlat> App::SceneFromJSON::getTextureFlatFromJSON(const rapidjson::Value &value) {
     std::shared_ptr<Textures::TextureFlat> myTexture = std::make_shared<Textures::TextureFlat>(Textures::TextureFlat());
     const rapidjson::Value& colorValue = value[VALUE_COLOR];
@@ -280,6 +278,7 @@ std::shared_ptr<App::Textures::TextureFlat> App::SceneFromJSON::getTextureFlatFr
     return myTexture;
 }
 
+// interprets a texture checker value
 std::shared_ptr<App::Textures::TextureChecker> App::SceneFromJSON::getTextureCheckerFromJSON(const rapidjson::Value &value) {
     std::shared_ptr<Textures::TextureChecker> myTexture = std::make_shared<Textures::TextureChecker>(Textures::TextureChecker());
     const rapidjson::Value& colorValue1 = value[VALUE_COLOR1];
@@ -292,21 +291,21 @@ std::shared_ptr<App::Textures::TextureChecker> App::SceneFromJSON::getTextureChe
     const rapidjson::Value& translationValue = transformationUVValue[VALUE_TRANSLATION];
     const rapidjson::Value& rotationValue = transformationUVValue[VALUE_ROTATION];
     const rapidjson::Value& scaleValue = transformationUVValue[VALUE_SCALE];
-    Vector2d translation = getXYVecto2dFromValue(translationValue);
+    Vector2d translation = getXYVector2dFromValue(translationValue);
     double rotation = rotationValue.GetDouble();
-    Vector2d scale = getXYVecto2dFromValue(scaleValue);
+    Vector2d scale = getXYVector2dFromValue(scaleValue);
     myTexture->setTransformation(translation,rotation,scale);
 
     return myTexture;
 }
 
+// interprets a texture gradient value
 std::shared_ptr<App::Textures::TextureGradient> App::SceneFromJSON::getTextureGradientFromJSON(const rapidjson::Value &value) {
     std::shared_ptr<Textures::TextureGradient> myTexture = std::make_shared<Textures::TextureGradient>(Textures::TextureGradient());
     const rapidjson::Value& stopsListValue = value[VALUE_TEXTURE_GRADIENT_STOPS];
-    for(auto const& stop: stopsListValue.GetArray()){
+    for(rapidjson::Value const& stop: stopsListValue.GetArray()){
         const rapidjson::Value& positionValue = stop[VALUE_POSITION];
         double position = positionValue.GetDouble();
-        std::cout<<"check: "<<position<<std::endl;
         const rapidjson::Value& colorValue = stop[VALUE_COLOR];
         Vector3d color = getRGBVector3dFromValue(colorValue);
         myTexture -> setStop(position, color);
@@ -314,18 +313,7 @@ std::shared_ptr<App::Textures::TextureGradient> App::SceneFromJSON::getTextureGr
     return myTexture;
 }
 
-
-
-// getTransformationFromJSON
-// getXYZVector3dFromJSON
-
-
-// m_objectsInScene.push_back(std::make_shared<ObjectPlane>(ObjectPlane()));
-// std::shared_ptr<MaterialSimple> whiteDiffuse = std::make_shared<MaterialSimple> (MaterialSimple());
-// m_lightsInScene.push_back(std::make_shared<LightPoint>(LightPoint()));
-
-
-// exceptions
+// TODO exceptions
 
 /*
 std::string message = "Transform dimensions must be 4x4, check:" +

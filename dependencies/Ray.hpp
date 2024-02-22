@@ -4,13 +4,15 @@
 #include <vector>
 #include "../include/Eigen/Eigen"
 
+// vector casted from one source to another in a 3D space
+
 using namespace Eigen;
 
 namespace App {
     class Ray {
     public:
-        Vector3d m_point1;
-        Vector3d m_point2;
+        Vector3d m_point1; // origin
+        Vector3d m_point2; // destination
         Vector3d m_orientation;
 
     public:

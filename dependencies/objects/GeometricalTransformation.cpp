@@ -9,9 +9,7 @@ App::GeometricalTransformation::GeometricalTransformation() {
     extractLinearTransform();
 }
 
-App::GeometricalTransformation::~GeometricalTransformation() {
-
-}
+App::GeometricalTransformation::~GeometricalTransformation() = default;
 
 App::GeometricalTransformation::GeometricalTransformation(const Vector3d &translation, const Vector3d &rotation,
                                                           const Vector3d &scale) {
@@ -19,42 +17,31 @@ App::GeometricalTransformation::GeometricalTransformation(const Vector3d &transl
     extractLinearTransform();
 }
 
+// general configuration needed
+void App::GeometricalTransformation::extractLinearTransform() {
+    m_linearTransformation = m_forwardTransformation.block(0,0,3,3);
+    m_linearTransformation = m_linearTransformation.inverse().eval();
+    m_linearTransformation = m_linearTransformation.transpose().eval();
+}
+
 App::GeometricalTransformation::GeometricalTransformation(const Matrix4d &forward, const Matrix4d &backward) {
-    // correct dimensions check
-    if(forward.rows() != 4 || forward.cols() != 4 || backward.rows() != 4 || backward.cols() != 4){
-        std::string message = "Transform dimensions must be 4x4, check:" +
-                              std::string("\nForward Transformation) Rows: ") + std::to_string(forward.rows()) +
-                              std::string(", Columns: ") + std::to_string(forward.cols()) +
-                              std::string("\nBackward Transformation) Rows: ") + std::to_string( backward.rows()) +
-                              std::string(", Columns: ") + std::to_string(backward.cols());
-        throw std::invalid_argument(message);
-    }
     m_forwardTransformation = forward;
     m_backwardTransformation = backward;
 }
 
 void App::GeometricalTransformation::setTransformation(const Vector3d &translation, const Vector3d &rotationInPercentage, const Vector3d &scale) {
-    /*// correct dimensions check
-    if(translation.rows() != 3 || translation.cols() != 1 || rotation.rows() != 3 || rotation.cols() != 1 || scale.rows() != 3 || scale.cols() != 1){
-        std::string message = "Transform dimensions must be 3x1, check:" +
-                              std::string("\nTranslation Transformation) Rows: ") + std::to_string(translation.rows()) +
-                              std::string(", Columns: ") + std::to_string(translation.cols()) +
-                              std::string("\nRotation Transformation) Rows: ") + std::to_string(rotation.rows()) +
-                              std::string(", Columns: ") + std::to_string(rotation.cols()) +
-                              std::string("\nScale Transformation) Rows: ") + std::to_string( scale.rows()) +
-                              std::string(", Columns: ") + std::to_string(scale.cols());
-        throw std::invalid_argument(message);
-    }*/
     Matrix4d translationFinal = Matrix4d::Identity();
     Matrix4d rotationXFinal = Matrix4d::Identity();
     Matrix4d rotationYFinal = Matrix4d::Identity();
     Matrix4d rotationZFinal = Matrix4d::Identity();
     Matrix4d scaleFinal = Matrix4d::Identity();
 
+    // configures translation
     translationFinal(0,3) = translation(0);
     translationFinal(1,3) = translation(1);
     translationFinal(2,3) = translation(2);
 
+    // configures rotation
     Vector3d rotation = rotationInPercentage * 2 * M_PI;
 
     rotationXFinal(1,1) = cos(rotation(0));
@@ -72,10 +59,12 @@ void App::GeometricalTransformation::setTransformation(const Vector3d &translati
     rotationZFinal(1,0) = sin(rotation(2));
     rotationZFinal(1,1) = cos(rotation(2));
 
+    // configures scale
     scaleFinal(0,0) = scale(0);
     scaleFinal(1,1) = scale(1);
     scaleFinal(2,2) = scale(2);
 
+    // configures final matrices
     m_forwardTransformation = translationFinal*rotationXFinal*rotationYFinal*rotationZFinal*scaleFinal;
     m_backwardTransformation = m_forwardTransformation.inverse();
 }
@@ -88,6 +77,12 @@ Matrix4d App::GeometricalTransformation::getBackward() const {
     return m_backwardTransformation;
 }
 
+// applies the norm to a vector
+Vector3d App::GeometricalTransformation::applyNorm(const Vector3d &inputVector) {
+    return m_linearTransformation * inputVector;
+}
+
+// applies the transformation to a ray
 App::Ray App::GeometricalTransformation::applyTransformation(const Ray &rayInput, bool isForwardTransformation) {
     App::Ray rayOutput;
     if (isForwardTransformation){
@@ -102,6 +97,7 @@ App::Ray App::GeometricalTransformation::applyTransformation(const Ray &rayInput
     return rayOutput;
 }
 
+// applies the transformation to a vector
 Vector3d App::GeometricalTransformation::applyTransformation(const Vector3d &vectorInput, bool isForwardTransformation) {
     Vector4d temp(vectorInput(0), vectorInput(1), vectorInput(2), 1.0);
     Vector4d result;
@@ -117,9 +113,10 @@ Vector3d App::GeometricalTransformation::applyTransformation(const Vector3d &vec
     return output;
 }
 
+// defines operator *
 namespace App{
-    App::GeometricalTransformation operator* (const GeometricalTransformation& leftHandSide, const GeometricalTransformation& rightHandSide){
-        Matrix4d forward = leftHandSide.getForward() * rightHandSide.getForward();
+    App::GeometricalTransformation operator* (const GeometricalTransformation& leftSide, const GeometricalTransformation& rightSide){
+        Matrix4d forward = leftSide.getForward() * rightSide.getForward();
 
         Matrix4d backward = forward.inverse();
 
@@ -129,38 +126,11 @@ namespace App{
     }
 }
 
-App::GeometricalTransformation App::GeometricalTransformation::operator= (const App::GeometricalTransformation &rightHandSide){
-    if (this != &rightHandSide){
-        m_forwardTransformation = rightHandSide.m_forwardTransformation;
-        m_backwardTransformation = rightHandSide.m_backwardTransformation;
+// defines operator =
+App::GeometricalTransformation App::GeometricalTransformation::operator= (const App::GeometricalTransformation &rightSide){
+    if (this != &rightSide){
+        m_forwardTransformation = rightSide.m_forwardTransformation;
+        m_backwardTransformation = rightSide.m_backwardTransformation;
     }
     return *this;
-}
-
-
-
-void App::GeometricalTransformation::printMatrix(bool isForwardTransformation)
-{
-    if (isForwardTransformation)
-    {
-        std::cout << m_forwardTransformation << std::endl << std::endl;;
-    }
-    else
-    {
-        std::cout << m_backwardTransformation << std::endl << std::endl;;
-    }
-}
-
-Vector3d App::GeometricalTransformation::applyNorm(const Vector3d &inputVector) {
-    return m_linearTransformation * inputVector;
-}
-
-void App::GeometricalTransformation::extractLinearTransform() {
-    m_linearTransformation = m_forwardTransformation.block(0,0,3,3);
-    m_linearTransformation = m_linearTransformation.inverse().eval();
-    m_linearTransformation = m_linearTransformation.transpose().eval();
-}
-
-Matrix3d App::GeometricalTransformation::getNormalTransformation() {
-    return m_linearTransformation;
 }

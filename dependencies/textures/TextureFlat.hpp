@@ -3,20 +3,21 @@
 
 #include "TextureGeneric.hpp"
 
-namespace App{
-    namespace Textures {
-        class TextureFlat : public TextureGeneric {
-        private:
-            Vector3d m_color;
-        public:
-            TextureFlat();
-            virtual ~TextureFlat() override;
+// flat texture that displays only one homogeneous color
 
-            virtual Vector3d getColor(const Vector2d &uvCoordinates) override;
+namespace App::Textures {
+    class TextureFlat : public TextureGeneric {
+    private:
+        Vector3d m_color;
+    public:
+        TextureFlat();
+        ~TextureFlat() override;
 
-            void setColor(const Vector3d &newColor);
-        };
-    }
+        Vector3d getColor(const Vector2d &uvCoordinates) override;
+
+        void setColor(const Vector3d &newColor);
+    };
 }
+
 
 #endif //RAY_TRACER_APPLICATION_TEXTUREFLAT_HPP

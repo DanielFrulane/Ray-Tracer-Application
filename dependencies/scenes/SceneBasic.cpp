@@ -1,6 +1,8 @@
 #include "SceneBasic.hpp"
 
-#define aspectRatio 1.0 /// TODO REFACTOR
+// this is a test version for generating a scene and is not used for the final application
+
+#define aspectRatio 1.0
 
 App::SceneBasic::SceneBasic() {
     generateSceneObjects();
@@ -8,9 +10,7 @@ App::SceneBasic::SceneBasic() {
     std::cout<<"generated objects"<<std::endl;
 }
 
-App::SceneBasic::~SceneBasic() {
-
-}
+App::SceneBasic::~SceneBasic() = default;
 
 void App::SceneBasic::generateSceneObjects() {
     m_hasCamera = true;
@@ -29,7 +29,6 @@ void App::SceneBasic::generateSceneObjects() {
     std::shared_ptr<Textures::TextureChecker> floorTexture = std::make_shared<Textures::TextureChecker> (Textures::TextureChecker());
     floorTexture->setTransformation({0.0,0.0},1.0/8.0,{16.0,16.0});
     floorMaterial->setTexture(floorTexture);
-
 
     std::shared_ptr<MaterialCompleteSimple> gradMat = std::make_shared<MaterialCompleteSimple> (MaterialCompleteSimple());
     gradMat -> m_reflectivity = 0.05;
@@ -139,7 +138,7 @@ void App::SceneBasic::generateSceneObjects() {
     m_lightsInScene.at(2) -> m_position << 0.0,-10.0,-5.0;
     m_lightsInScene.at(2) -> m_color << 0.4,0.4,1.0;
 
-    std::cout<<"Objects in scene: "<<m_objectsInScene.size()<<std::endl;
     //std::cout<<"Objects in composite: "<<composite->m_objects.size()<<std::endl;
+    std::cout<<"Objects in scene: "<<m_objectsInScene.size()<<std::endl;
     std::cout<<"Lights in scene: "<<m_lightsInScene.size()<<std::endl;
 }

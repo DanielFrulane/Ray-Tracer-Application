@@ -1,45 +1,36 @@
 #include "ObjectGeneric.hpp"
-#include <math.h>
+#include <cmath>
 
 #define PRECISION_CONSTANT 1e-21f;
 #define ARBITRARY_HIGH_NUMBER 1e6
 
-App::ObjectGeneric::ObjectGeneric() {
-    m_hasMaterial=false;
-}
+App::ObjectGeneric::ObjectGeneric() = default;
 
-App::ObjectGeneric::~ObjectGeneric(){
-    ;
-}
+App::ObjectGeneric::~ObjectGeneric()= default;
 
 bool App::ObjectGeneric::isIntersecting(const App::Ray &rayCasted, HitInformation &hitInformation) {
     return false;
 }
 
 bool App::ObjectGeneric::isWithinProximityPrecision(const double float1, const double float2) {
-    return fabs(float1-float2) < PRECISION_CONSTANT;
+    return abs(float1-float2) < PRECISION_CONSTANT;
 }
 
 void App::ObjectGeneric::setTransformation(const App::GeometricalTransformation &transformation) {
     m_transformation = transformation;
 }
 
-bool App::ObjectGeneric::setMaterial(const std::shared_ptr<MaterialGeneric> &material) {
+void App::ObjectGeneric::setMaterial(const std::shared_ptr<MaterialGeneric> &material) {
     m_material = material;
-    m_hasMaterial = true;
-    return m_hasMaterial;
 }
 
+// precise the extents of the bounding box
 void App::ObjectGeneric::getExtents(Vector2d &xLim, Vector2d &yLim, Vector2d &zLim) {
-    // Construct corners of a cube based on the current limits.
+    // gets corners of a cuboid based on the current limits.
     std::vector<Vector3d> cornerPoints = getCuboid(-1.0,1.0,-1.0,1.0,-1.0,1.0);
     GeometricalTransformation combinedTransformation = m_transformation * m_boundingBoxTransformation;
-    std::cout<<"transformations"<<std::endl;
-    std::cout<<m_transformation.getForward()<<std::endl;
-    std::cout<<m_boundingBoxTransformation.getForward()<<std::endl;
-    std::cout<<combinedTransformation.getForward()<<std::endl;
 
-    // Apply the transforms to the unit cube corner points and compute limits.
+    // applies the compositions transformation to the cuboid
     double minX = ARBITRARY_HIGH_NUMBER;
     double minY = ARBITRARY_HIGH_NUMBER;
     double minZ = ARBITRARY_HIGH_NUMBER;
@@ -71,7 +62,6 @@ void App::ObjectGeneric::getExtents(Vector2d &xLim, Vector2d &yLim, Vector2d &zL
         }
     }
 
-    // Return the limits.
     xLim(0) = minX;
     xLim(1) = maxX;
     yLim(0) = minY;
@@ -80,29 +70,24 @@ void App::ObjectGeneric::getExtents(Vector2d &xLim, Vector2d &yLim, Vector2d &zL
     zLim(1) = maxZ;
 }
 
-void App::ObjectGeneric::getExtents(const App::GeometricalTransformation &parentTransformationMatrix, Vector3d &xLim,
-                                    Vector3d &yLim, Vector3d &zLim) {
-    /// TODO
-}
-
+// returns a cuboid defined with the dimensions
 std::vector<Vector3d> App::ObjectGeneric::getCuboid(double xMin, double xMax, double yMin, double yMax, double zMin, double zMax) {
-    std::vector<Vector3d> corners (8);
-    corners.at(0) = {xMin - m_boundingBoxPadding, yMin - m_boundingBoxPadding, zMin - m_boundingBoxPadding};
-    corners.at(1) = {xMin - m_boundingBoxPadding, yMin - m_boundingBoxPadding, zMax + m_boundingBoxPadding};
-    corners.at(2) = {xMax + m_boundingBoxPadding, yMin - m_boundingBoxPadding, zMax + m_boundingBoxPadding};
-    corners.at(3) = {xMax + m_boundingBoxPadding, yMin - m_boundingBoxPadding, zMin - m_boundingBoxPadding};
-    corners.at(4) = {xMin - m_boundingBoxPadding, yMax + m_boundingBoxPadding, zMin - m_boundingBoxPadding};
-    corners.at(5) = {xMin - m_boundingBoxPadding, yMax + m_boundingBoxPadding, zMax - m_boundingBoxPadding}; // TODO VERIFY
-    corners.at(6) = {xMax + m_boundingBoxPadding, yMax + m_boundingBoxPadding, zMax + m_boundingBoxPadding};
-    corners.at(7) = {xMax + m_boundingBoxPadding, yMax + m_boundingBoxPadding, zMin - m_boundingBoxPadding};
+    std::vector<Vector3d> corners (8); // 8 vertices
+    corners.at(0) = {xMin, yMin, zMin};
+    corners.at(1) = {xMin, yMin, zMax};
+    corners.at(2) = {xMax, yMin, zMax};
+    corners.at(3) = {xMax, yMin, zMin};
+    corners.at(4) = {xMin, yMax, zMin};
+    corners.at(5) = {xMin, yMax, zMax};
+    corners.at(6) = {xMax, yMax, zMax};
+    corners.at(7) = {xMax, yMax, zMin};
     return corners;
 }
 
-void App::ObjectGeneric::calculateUVSpace(const Vector3d &localPointOfIntersection, Vector2d &uvCoordinates) {
+// calculates the UV projection for each type of surface
+void App::ObjectGeneric::calculateUVSpace(const Vector3d &localPointOfIntersection, Vector2d &uvCoordinates) const {
     switch (m_uvMapType) {
-        case uvSPHERE:
-        {
-            // Spherical projection.
+        case uvSPHERE:{
             double x = localPointOfIntersection(0);
             double y = localPointOfIntersection(1);
             double z = localPointOfIntersection(2);
@@ -112,16 +97,12 @@ void App::ObjectGeneric::calculateUVSpace(const Vector3d &localPointOfIntersecti
             uvCoordinates(1) = v;
             break;
         }
-        case uvPLANE:
-        {
-            // Plane projection.
+        case uvPLANE:{
             uvCoordinates(0) = localPointOfIntersection(0);
             uvCoordinates(1) = localPointOfIntersection(1);
             break;
         }
-        case uvCYLINDER:
-        {
-            // Cylinder projection.
+        case uvCYLINDER:{
             double x = localPointOfIntersection(0);
             double y = localPointOfIntersection(1);
             double z = localPointOfIntersection(2);
@@ -131,69 +112,37 @@ void App::ObjectGeneric::calculateUVSpace(const Vector3d &localPointOfIntersecti
             uvCoordinates(1) = v;
             break;
         }
-        case uvCUBOID:
-        {
-            // Box projection.
+        case uvCUBOID:{
             double x = localPointOfIntersection(0);
             double y = localPointOfIntersection(1);
             double z = localPointOfIntersection(2);
             double u = 0.0;
             double v = 0.0;
 
-            // Define default UV transform matrix.
-            Matrix3d uvTransformation = Matrix3d::Identity(); ///////////// ?
-
-            if (isWithinProximityPrecision(x, -1.0))
-            {
-                // Left face.
+            Matrix3d uvTransformation = Matrix3d::Identity();
+            if (isWithinProximityPrecision(x, -1.0)){ // left face
                 u = -(y * 0.25) - 0.75;
                 v = -z * 0.25;
-
-            }
-            else if (isWithinProximityPrecision(x, 1.0))
-            {
-                // Right face.
+            } else if (isWithinProximityPrecision(x, 1.0)){ // right face
                 u = (y * 0.25) + 0.25;
                 v = -z * 0.25;
-
-            }
-            else if (isWithinProximityPrecision(y, -1.0))
-            {
-                // Front face.
+            } else if (isWithinProximityPrecision(y, -1.0)){ // front face
                 u = (x * 0.25) - 0.25;
                 v = (-z * 0.25) - 0.5;
-
-            }
-            else if (isWithinProximityPrecision(y, 1.0))
-            {
-                // Back face.
-                u = -(x * 0.25) - 0.25;;
+            } else if (isWithinProximityPrecision(y, 1.0)){ // back face
+                u = -(x * 0.25) - 0.25;
                 v = (-z * 0.25) + 0.5;
-
-            }
-            else if (isWithinProximityPrecision(z, -1.0))
-            {
-                // Top face.
+            } else if (isWithinProximityPrecision(z, -1.0)){ // top face
                 u = (x * 0.25) + 0.75;
                 v = y * 0.25;
-
-            }
-            else if (isWithinProximityPrecision(z, 1.0))
-            {
-                // Bottom face.
+            } else if (isWithinProximityPrecision(z, 1.0)){ // bottom face
                 u = (x * 0.25) - 0.25;
                 v = y * 0.25;
-
             }
-            else
-            {
-                // The object isn't a box...
-
-            }
+            // else: object is not a cuboid
 
             uvCoordinates(0) = u;
             uvCoordinates(1) = v;
-
             break;
         }
     }

@@ -12,7 +12,7 @@
         "indexOfRefraction": 1.333,
         "texture": {
             "type": "flat",
-            "color": {"red":0.9, "green":0.9, "blue":0.5}
+            "color": {"red":0.6, "green":0.6, "blue":1}
         }
     }
 }

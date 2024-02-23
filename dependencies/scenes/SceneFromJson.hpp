@@ -12,10 +12,8 @@ namespace App {
         SceneFromJSON();
         ~SceneFromJSON() override;
         void generateSceneObjects() override;
-    private:
-        std::filesystem::path m_path;
-        void setDirectory();
 
+    private:
         void interpretFile(const char* fileName);
         void interpretJSONType(const rapidjson::Value& d);
         void interpretJSONCamera(const rapidjson::Value& d);

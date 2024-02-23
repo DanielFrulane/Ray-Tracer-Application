@@ -1,6 +1,6 @@
 #include "Application.hpp"
-#include "include/Eigen/Eigen"
 #include <iostream>
+#include <limits>
 
 #define SCREEN_WIDTH        720
 #define SCREEN_HEIGHT       720
@@ -12,26 +12,53 @@
 #define TILE_RENDERING      1
 #define TILE_RENDERED       2
 
+#define USER_FOLDER_NAME    "userFiles"
+#define OUTPUT_IMAGE_NAME   "output.png"
+
 Application::Application() {
-    m_scene = App::SceneFromJSON();
     isRunning = true;
     pWindow = NULL;
     pRenderer = NULL;
     m_width = SCREEN_WIDTH;
     m_height = SCREEN_HEIGHT;
+    m_depth = IMAGE_DEPTH;
     m_maxGammaLevel = 1.0;
     m_maxThreads = 8;
     m_currentNumberOfThreads = 0;
     m_threadCounter = new std::atomic<int> (0);
 }
 
+// finds where the files are
+void Application::setDirectory() {
+    m_path = std::filesystem::current_path();
+    m_path = m_path / USER_FOLDER_NAME;
+    std::cout<<"User folder path: "<<m_path<<std::endl;
+    std::filesystem::current_path(m_path);
+}
+
+void Application::printWelcome(){
+    std::cout<<std::endl<<"Ray Tracer Application"<<std::endl;
+    std::cout<<"2024 Daniel Carvalho Frulane de Souza"<<std::endl;
+    std::cout<<"https://github.com/DanielFrulane"<<std::endl;
+    std::cout<<" - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ -"<<std::endl;
+    std::cout<<"Welcome to my Ray Tracer Application!\n"
+               "Make sure your files are properly configured in the 'userFiles' folder before running the application.\n"
+               "Your image will be saved in the same folder automatically when closing the application.\n"
+               "Follow the documentation provided in the .README file for further detailed instructions."<<std::endl;
+    std::cout<<"Press Enter to continue when you are done."<<std::endl;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
+}
+
 // called to execute the program
 int Application::inExecution(){
+    setDirectory();
+    printWelcome();
+    m_scene = App::SceneFromJSON();
     SDL_Event event;
     if (!inInitialization()){ // SDL: ensures successful initialization
         return -1;
     }
-    std::cout<<"SDL Done initializing\n";
+    std::cout<<"Application initialized."<<std::endl;
     while (isRunning){
         while(SDL_PollEvent(&event) != 0){
             inEvent(&event);
@@ -40,6 +67,9 @@ int Application::inExecution(){
         inRender();
         SDL_Delay(1);
     }
+    std::cout<<"Saving image..."<<std::endl;
+    saveRenderedAsTypePNG();
+    std::cout<<"Exiting..."<<std::endl;
     inExit();
     return 0;
 }
@@ -182,7 +212,7 @@ bool Application::generateTileGrid(int tileWidth, int tileHeight) {
     bmask = 0x00ff0000;
     amask = 0xff000000;
 #endif
-    SDL_Surface *temporarySurface = SDL_CreateRGBSurface(0, tileWidth, tileHeight, IMAGE_DEPTH, rmask, gmask, bmask, amask);
+    SDL_Surface *temporarySurface = SDL_CreateRGBSurface(0, tileWidth, tileHeight, m_depth, rmask, gmask, bmask, amask);
 
     // generate tiles
     for (int y=0; y < numberOfTilesHeight; ++y){
@@ -233,4 +263,24 @@ void Application::renderTile(App::TileInformation *tile, std::atomic<int> *threa
     int numberOfActiveThreads = threadCounter->load(std::memory_order_acquire);
     threadCounter->store(numberOfActiveThreads-1,std::memory_order_release);
     tileFlag->store(TILE_RENDERED,std::memory_order_release);
+}
+
+// saves image as PNG
+void Application::saveRenderedAsTypePNG(){
+    Uint32 rmask, gmask, bmask, amask;
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+    rmask = 0x0000ff00;
+    gmask = 0x00ff0000;
+    bmask = 0xff000000;
+    amask = 0x000000ff;
+#else
+    rmask = 0x00ff0000;
+    gmask = 0x0000ff00;
+    bmask = 0x000000ff;
+    amask = 0xff000000;
+#endif
+    SDL_Surface* surface = SDL_CreateRGBSurface(0, m_width, m_height, m_depth, rmask, gmask, bmask, amask);
+    SDL_RenderReadPixels(pRenderer, NULL, SDL_PIXELFORMAT_ARGB8888, surface->pixels, surface->pitch);
+    IMG_SavePNG(surface, OUTPUT_IMAGE_NAME);
+    SDL_FreeSurface(surface);
 }

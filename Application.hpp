@@ -2,12 +2,14 @@
 #define APPLICATION_H
 
 #include "include/SDL2/SDL.h"
+#include "include/SDL2/SDL_image.h"
 #include "dependencies/scenes/SceneGeneric.hpp"
 #include "dependencies/scenes/SceneBasic.hpp"
 #include "dependencies/scenes/SceneFromJson.hpp"
 #include "dependencies/Camera.hpp"
 #include "dependencies/TileInformation.hpp"
 #include "include/opencv2/opencv.hpp"
+#include "include/Eigen/Eigen"
 #include <thread>
 #include <atomic>
 
@@ -20,7 +22,8 @@ private:
     bool isRunning;
     SDL_Window *pWindow;
     SDL_Renderer *pRenderer;
-    int m_width, m_height;
+    int m_width, m_height, m_depth;
+    std::filesystem::path m_path;
 
     // Convert colors ranged from 0 to 1 to unsigned integers for SDL interpretation
     Uint32 convertColor(const double r, const double g, const double b);
@@ -51,8 +54,15 @@ public:
     void inRender();
     void inExit();
 
+    // initializes the application
+    void printWelcome();
+    void setDirectory();
+
     // threaded initialization of tiles
     void renderTile(App::TileInformation *tile, std::atomic<int> *threadCounter, std::atomic<int> *tileFlag);
+
+    // saves image
+    void saveRenderedAsTypePNG();
 };
 
 #endif //APPLICATION_H

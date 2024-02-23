@@ -1,7 +1,6 @@
 #include "SceneFromJson.hpp"
 #include <iostream>
 
-#define OBJECT_FOLDER_NAME "objectFiles"
 #define VALUE_TYPE "type"
 #define VALUE_TYPE_OBJECT_CAMERA "camera"
 #define VALUE_TYPE_OBJECT_LIGHT "light"
@@ -37,17 +36,18 @@
 #define VALUE_TEXTURE_GRADIENT_STOPS "stops"
 
 App::SceneFromJSON::SceneFromJSON() {
-    setDirectory();
     generateSceneObjects();
     checkIfHasAllNecessaryComponents();
     std::cout<<"configured objects: "<<m_objectsInScene.size()<<std::endl;
+    std::cout<<"configured lights: "<<m_lightsInScene.size()<<std::endl;
 }
 
 App::SceneFromJSON::~SceneFromJSON() = default;
 
-// reads all .json files to generate objecs
+// reads all .json files to generate objects
 void App::SceneFromJSON::generateSceneObjects() {
-    for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(m_path)) {
+    std::filesystem::path currentPath = std::filesystem::current_path();
+    for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(currentPath)) {
         if (std::filesystem::is_regular_file(entry)) {
             if (entry.path().extension() == ".json") {
                 std::cout << "Reading file: " << entry.path().filename() << std::endl;
@@ -55,14 +55,6 @@ void App::SceneFromJSON::generateSceneObjects() {
             }
         }
     }
-}
-
-// finds where the files are
-void App::SceneFromJSON::setDirectory() {
-    m_path = std::filesystem::current_path();
-    m_path = m_path / OBJECT_FOLDER_NAME;
-    std::cout<<"path: "<<m_path<<std::endl;
-    std::filesystem::current_path(m_path);
 }
 
 void App::SceneFromJSON::interpretFile(const char* fileName) {

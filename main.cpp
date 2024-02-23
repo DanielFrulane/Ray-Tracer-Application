@@ -8,7 +8,6 @@
 using namespace Eigen;
 
 int main(int argc, char* argv[]){
-    std::cout<<"Running"<<std::endl;
     Application app;
     return app.inExecution();
 }

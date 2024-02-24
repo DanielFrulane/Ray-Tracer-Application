@@ -8,7 +8,6 @@
 #include "dependencies/scenes/SceneFromJson.hpp"
 #include "dependencies/Camera.hpp"
 #include "dependencies/TileInformation.hpp"
-#include "include/opencv2/opencv.hpp"
 #include "include/Eigen/Eigen"
 #include <thread>
 #include <atomic>

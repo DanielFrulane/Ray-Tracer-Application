@@ -103,7 +103,7 @@ void App::SceneFromJSON::interpretJSONType(const rapidjson::Value& d) {
 // interprets a camera file
 void App::SceneFromJSON::interpretJSONCamera(const rapidjson::Value& d) {
     if (m_hasCamera){
-        // TODO error throw
+        throw std::invalid_argument("scene tried to configure more than one camera");
     }
     const rapidjson::Value& positionValue = d[VALUE_POSITION];
     const rapidjson::Value& lookAtValue = d[VALUE_LOOK_AT];
@@ -199,9 +199,7 @@ std::shared_ptr<App::ObjectGeneric> App::SceneFromJSON::getConcreteJSONObject(co
         myObject = std::make_shared<ObjectCuboid>(ObjectCuboid());
 
     } else {
-        std::cout<<"unrecognized\n";
-        // TODO error throw;
-        return nullptr;
+        throw std::invalid_argument("object type is not recognized");
     }
     const rapidjson::Value& transformationValue = d[VALUE_TRANSFORMATION];
     GeometricalTransformation myTransformation = getTransformationFromJSON(transformationValue);
@@ -252,12 +250,7 @@ std::shared_ptr<App::Textures::TextureGeneric> App::SceneFromJSON::getTextureFro
         myTexture = getTextureGradientFromJSON(value);
         return myTexture;
     } else {
-        std::cout<<"unrecognized\n";
-        // error throw;
-        std::shared_ptr<Textures::TextureFlat> myTexture;
-        myTexture = std::make_shared<Textures::TextureFlat> (Textures::TextureFlat());
-        myTexture->setColor({1.0,1.0,1.0});
-        return myTexture;
+        throw std::invalid_argument("material texture type is not recognized");
     }
 }
 
@@ -304,24 +297,3 @@ std::shared_ptr<App::Textures::TextureGradient> App::SceneFromJSON::getTextureGr
     }
     return myTexture;
 }
-
-// TODO exceptions
-
-/*
-std::string message = "Transform dimensions must be 4x4, check:" +
-                      std::string("\nForward Transformation) Rows: ") + std::to_string(forward.rows()) +
-                      std::string(", Columns: ") + std::to_string(forward.cols()) +
-                      std::string("\nBackward Transformation) Rows: ") + std::to_string( backward.rows()) +
-                      std::string(", Columns: ") + std::to_string(backward.cols());
-throw std::invalid_argument(message);
- * */
-
-/*
- * if (!fp) App::ObjectGeneric::cerr << "Failed to open input.json for reading." << std::endl;
-        return 1;
-    }
- */
-
-// directory not found
-// convert to float
-// not enough scene descriptions

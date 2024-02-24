@@ -14,23 +14,20 @@ void App::SceneGeneric::generateSceneObjects() {}
 // checks if it is possible to properly render a scene given the current configuration
 void App::SceneGeneric::checkIfHasAllNecessaryComponents() {
     if (!m_hasCamera){
-        std::cout<<"camera not configured"<<std::endl;
-        return;
+        throw std::invalid_argument("camera not configured");
     }
     if (m_lightsInScene.empty()){
-        std::cout<<"no lights in scene"<<std::endl;
-        return;
+        throw std::invalid_argument("no lights in scene");
     }
     if (m_objectsInScene.empty()){
-        std::cout<<"no objects in scene"<<std::endl;
-        return;
+        throw std::invalid_argument("no objects in scene");
     }
     for (const std::shared_ptr<ObjectGeneric>& currentObject : m_objectsInScene){
         if (currentObject->m_material == nullptr){
-            std::cout<<"no material in object"<<std::endl;
+            throw std::invalid_argument("no material in object");
         } else {
             if (currentObject->m_material->m_texture == nullptr){
-                std::cout<<"no texture in material"<<std::endl;
+                throw std::invalid_argument("no texture in material");
             }
         }
     }

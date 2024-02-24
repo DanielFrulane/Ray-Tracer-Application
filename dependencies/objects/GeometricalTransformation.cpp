@@ -1,5 +1,4 @@
 #include "GeometricalTransformation.hpp"
-#include <iostream>
 
 using namespace Eigen;
 

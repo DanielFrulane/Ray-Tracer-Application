@@ -8,6 +8,9 @@
 #include "dependencies/scenes/SceneFromJson.hpp"
 #include "dependencies/Camera.hpp"
 #include "dependencies/TileInformation.hpp"
+#include "dependencies/RTMotors/RTMotorGeneric.hpp"
+#include "dependencies/RTMotors/RTMotorThreaded.hpp"
+#include "dependencies/RTMotors/RTMotorSimple.hpp"
 #include "include/Eigen/Eigen"
 #include <thread>
 #include <atomic>
@@ -24,29 +27,29 @@ private:
     int m_width, m_height, m_depth;
     std::filesystem::path m_path;
 
+    // what will generate the scene
+    int m_chosenMotor;
+    App::RTMotorThreaded m_motorThreaded;
+    App::RTMotorSimple m_motorSimple;
+
     // Convert colors ranged from 0 to 1 to unsigned integers for SDL interpretation
     Uint32 convertColor(const double r, const double g, const double b);
     double m_maxGammaLevel; // for gamma correction
+    void convertImageToTexture(App::TileInformation &tile);
 
     // threaded initialization of tiles
     int m_numberOfTilesInWidth, m_numberOfTilesInHeight;
-    void convertImageToTexture(App::TileInformation &tile);
-    bool generateTileGrid(int tileWidth, int tileHeight);
-    bool destroyTileGrid();
-    void resetTileFlags();
-
-    // thread support
-    int m_maxThreads;
-    int m_currentNumberOfThreads;
-    std::atomic<int> *m_threadCounter;
-    std::vector<std::thread> m_threads;
     std::vector<App::TileInformation> m_tiles;
     std::vector<std::atomic<int>*> m_tileFlags; // not rendered, rendered, rendering
+    void resetTileFlags();
+    bool generateTileGrid(int tileWidth, int tileHeight);
+    bool destroyTileGrid();
 
 public:
-    // mainly SDL related functions for rendering and showing the image
     Application();
     int inExecution();
+
+private: // mainly SDL related functions for rendering and showing the image
     bool inInitialization();
     void inEvent(SDL_Event *event);
     void inLoop();
@@ -56,9 +59,6 @@ public:
     // initializes the application
     void printWelcome();
     void setDirectory();
-
-    // threaded initialization of tiles
-    void renderTile(App::TileInformation *tile, std::atomic<int> *threadCounter, std::atomic<int> *tileFlag);
 
     // saves image
     void saveRenderedAsTypePNG();

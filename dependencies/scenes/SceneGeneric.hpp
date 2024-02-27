@@ -30,18 +30,12 @@ namespace App {
         std::vector<std::shared_ptr<ObjectGeneric>> m_objectsInScene;
         std::vector<std::shared_ptr<LightGeneric>> m_lightsInScene;
 
-        void checkIfHasAllNecessaryComponents();
+        void checkIfHasAllNecessaryComponents() const;
 
         SceneGeneric();
         virtual ~SceneGeneric();
 
         virtual void generateSceneObjects();
-        void renderTile(App::TileInformation *tile);
-        bool castRay(Ray &castedRay, std::shared_ptr<ObjectGeneric> &closestObject, HitInformation &closestHitInformation);
-
-    private:
-        Vector3d renderPixel(int x, int y, int width, int height);
-        static int convertCoordinatesToLinearIndex(int x, int y, int width, int height);
     };
 }
 

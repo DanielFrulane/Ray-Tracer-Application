@@ -12,6 +12,9 @@
 #define TILE_RENDERING      1
 #define TILE_RENDERED       2
 
+#define MOTOR_SIMPLE        0
+#define MOTOR_THREADED      1
+
 #define USER_FOLDER_NAME    "userFiles"
 #define OUTPUT_IMAGE_NAME   "output.png"
 
@@ -23,9 +26,7 @@ Application::Application() {
     m_height = SCREEN_HEIGHT;
     m_depth = IMAGE_DEPTH;
     m_maxGammaLevel = 1.0;
-    m_maxThreads = 8;
-    m_currentNumberOfThreads = 0;
-    m_threadCounter = new std::atomic<int> (0);
+    m_chosenMotor = MOTOR_SIMPLE;
 }
 
 // finds where the files are
@@ -45,8 +46,23 @@ void Application::printWelcome(){
                "Make sure your files are properly configured in the 'userFiles' folder before running the application.\n"
                "Your image will be saved in the same folder automatically when closing the application.\n"
                "Follow the documentation provided in the .README file for further detailed instructions."<<std::endl;
-    std::cout<<"Press Enter to continue when you are done."<<std::endl;
+    std::cout<<"Choose your motor when you are done:"<<std::endl;
+    std::cout<<MOTOR_SIMPLE<<": Simple Motor (Default)"<<std::endl;
+    std::cout<<MOTOR_THREADED<<": Threaded Motor"<<std::endl;
+
+    // read the input from the user
+    int userInput = MOTOR_SIMPLE;
+    std::cin >> userInput;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
+
+    // Check if the input is valid
+    if (userInput == MOTOR_THREADED) {
+        std::cout << "THREADED chosen"<< std::endl;
+        m_chosenMotor = MOTOR_THREADED;
+    } else {
+        std::cout << "SIMPLE (DEFAULT) chosen"<< std::endl;
+        m_chosenMotor = MOTOR_SIMPLE;
+    }
 }
 
 // called to execute the program
@@ -58,6 +74,8 @@ int Application::inExecution(){
     if (!inInitialization()){ // SDL: ensures successful initialization
         return -1;
     }
+    m_motorThreaded.setScene(m_scene);
+    m_motorSimple.setScene(m_scene);
     std::cout<<"Application initialized."<<std::endl;
     while (isRunning){
         while(SDL_PollEvent(&event) != 0){
@@ -85,6 +103,7 @@ bool Application::inInitialization() {
         pRenderer = SDL_CreateRenderer(pWindow, -1, 0);
         m_scene.m_height = m_width;
         m_scene.m_width = m_height;
+        std::cout<<"scene dimensions: "<<m_scene.m_width<<"x"<<m_scene.m_height<<std::endl;
 
         if (!generateTileGrid(TILE_WIDTH,TILE_HEIGHT)){
             std::cout<<"failed tile Grid"<<std::endl;
@@ -103,15 +122,10 @@ bool Application::inInitialization() {
 
 // function to generate the all the pixels for all the tiles
 void Application::inLoop() {
-    for (int i = 0; i < m_tiles.size(); ++i) {
-        if (m_tileFlags.at(i)->load(std::memory_order_acquire) == TILE_NOT_RENDERED){
-            if (m_threadCounter ->load(std::memory_order_acquire) < m_maxThreads){
-                int numberOfActiveThreads = m_threadCounter->load(std::memory_order_acquire);
-                m_threadCounter->store(numberOfActiveThreads+1, std::memory_order_release);
-                std::thread renderThread (&Application::renderTile, this, &m_tiles.at(i),m_threadCounter,m_tileFlags.at(i));
-                renderThread.detach();
-            }
-        }
+    if(m_chosenMotor == MOTOR_THREADED){
+        m_motorThreaded.iterateTiles(m_tiles, m_tileFlags);
+    } else if (m_chosenMotor == MOTOR_SIMPLE) {
+        m_motorSimple.iterateTiles(m_tiles, m_tileFlags);
     }
 }
 
@@ -225,9 +239,8 @@ bool Application::generateTileGrid(int tileWidth, int tileHeight) {
             temporaryTile.pTexture = SDL_CreateTextureFromSurface(pRenderer, temporarySurface);
             temporaryTile.rgb.resize(temporaryTile.width * temporaryTile.height);
             m_tiles.push_back(temporaryTile);
-            // render complete
         }
-    }
+    } // tile grid complete
 
     // reset all tile flags
     for (int i=0; i<m_tiles.size(); ++i){
@@ -248,23 +261,6 @@ bool Application::destroyTileGrid() {
     return true;
 }
 
-// resets tile flags
-void Application::resetTileFlags() {
-    for (int i = 0; i < m_tiles.size(); ++i) {
-        m_tileFlags.at(i)->store(TILE_NOT_RENDERED,std::memory_order_release);
-        m_tiles.at(i).textureComplete = false;
-    }
-}
-
-// render tile
-void Application::renderTile(App::TileInformation *tile, std::atomic<int> *threadCounter, std::atomic<int> *tileFlag) {
-    tileFlag->store(TILE_RENDERING,std::memory_order_release);
-    m_scene.renderTile(tile);
-    int numberOfActiveThreads = threadCounter->load(std::memory_order_acquire);
-    threadCounter->store(numberOfActiveThreads-1,std::memory_order_release);
-    tileFlag->store(TILE_RENDERED,std::memory_order_release);
-}
-
 // saves image as PNG
 void Application::saveRenderedAsTypePNG(){
     Uint32 rmask, gmask, bmask, amask;
@@ -283,4 +279,12 @@ void Application::saveRenderedAsTypePNG(){
     SDL_RenderReadPixels(pRenderer, NULL, SDL_PIXELFORMAT_ARGB8888, surface->pixels, surface->pitch);
     IMG_SavePNG(surface, OUTPUT_IMAGE_NAME);
     SDL_FreeSurface(surface);
+}
+
+// resets tile flags
+void Application::resetTileFlags() {
+    for (int i = 0; i < m_tiles.size(); ++i) {
+        m_tileFlags.at(i)->store(TILE_NOT_RENDERED,std::memory_order_release);
+        m_tiles.at(i).textureComplete = false;
+    }
 }

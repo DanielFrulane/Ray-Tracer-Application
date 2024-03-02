@@ -59,7 +59,6 @@ through it with a reduced influence in the final color of the intersection, simu
 6. Textures: Pattern of colors in the surface of the object.
 
 ### Transformations
-
 The library allows the free placement of objects in a 3D scene, without needing individual definitions for each placement. 
 To achieve this, transformations between 2D (u,v) and 3D (x,y,z) representations must be applied to properly represent 
 the intended properties of the objects:
@@ -72,8 +71,7 @@ with the object's instance.
 4. Placement of texture in an object (2D -> 3D): For the texture to be rendered in the object, it needs to firstly go through
 a transformation to properly calculate its new color values for that position. 
 
-### Object composition and bounding boxes 
-
+### Object composition and bounding boxes
 Object compositions are a special type of object that is composed of a list of objects (that can also be object compositions).
 They allow the definitions of internal transformations for the objects within it and also a transformation for itself, 
 making it easier to edit the placement of different objects in the scene. This composition is associated with a bounding box
@@ -84,13 +82,11 @@ since the number of intersection tests is reduced.
 ![Bounding Box of a sphere](/resources/boundingbox.png)
 
 ## Using .json files for describing the scene
-
 The folder "userFiles" is used by the application to manage the input .json files given by the user and output the image
 file rendered. This section aims to explain how to properly set up the user .json files describing the scene in order to
 configure the rendering of any desired scene easily. Some examples are already available in the folder for reference. 
 
 ### Generalities
-
 Files in json are very simple and can represent object data without lots of unused information. For our representation,
 the name of the file itself does not matter, since a "type" field is dedicated to discerning the different types of 
 scene components represented in the file. All files need to specify only one type of component for the scene, and this 
@@ -100,7 +96,6 @@ Above all, it is important to pay attention to the axis coordinates and transfor
 the components.
 
 ### Camera
-
 - **"type":** "camera".
 - **"position":** {"x": x, "y": y,"z": z}, where (x,y,z) are the 3D coordinates in the scene represented in floating point notation. 
 This is where the camera will be placed.
@@ -109,10 +104,9 @@ This is where the camera will be looking at.
 - **"up":** {"x": x, "y": y,"z": z}, where (x,y,z) are the 3D coordinates in the scene represented in floating point notation.
 This is what is perceived as "up".
 - **"zoomOut":** positive float value, where for values > 1 the camera will be zooming out and for values < 1 it will be zooming in.
-- **"aspectRatio":** positive float value representing the ratio between the width and height of the rendered image.
+- **"ASPECT_RATIO":** positive float value representing the ratio between the width and height of the rendered image.
 
 ### Lights
-
 - **"type":** "light".
 - **"position":** {"x": x, "y": y,"z": z}, where (x,y,z) are the 3D coordinates in the scene represented in floating point notation.
 This is where the light will be placed.
@@ -121,7 +115,6 @@ The ranged values will be converted to the rgb representation, that is, 0.0 -> 0
 All light colors are standardized in this same way.
 
 ### Objects
-
 - **"type":** "sphere", "plane", "cylinder", "cone" or "cuboid". This is the type of the object.
 - **"transformation":** Representation of the 3x3 matrix that specifies the geometrical transformation of the object.
   All fields are represented in floating point values.
@@ -145,12 +138,12 @@ Textures have different fields for each type. Their colors will be used for the 
 
 ##### Flat
 A simple texture of one homogenous color without any special behavior.
-- **"type":** "flat",
+- **"type":** "flat".
 - **"color":** {"red": r, "green": g,"blue": b}, in the standard representation.
 
 ##### Checker
-A texture of two homogenous colors without any special behavior, displayed in a checkers pattern.
-- **"type":** "checker"
+A texture of two homogenous colors without any special behavior, displayed in a checker pattern.
+- **"type":** "checker".
 - **"transformationUV":** Representation of the 2x2 matrix that specifies the geometrical transformation of the texture.
   All fields are represented in floating point values.
   - **"translation":** {"x": x, "y": y}, the position of the center of the texture.
@@ -161,38 +154,111 @@ A texture of two homogenous colors without any special behavior, displayed in a 
 
 ##### Gradient
 Various colors are displayed in a gradient pattern.
-- **"type":** "gradient"
+- **"type":** "gradient".
 - **"stops":** List of stops for the gradient (at least two). Each stop is represented by two values:
   - **"position":** Floating point ranged from 0.0 to 1.0 with the position of the color in the gradient.
   - **"color":** {"red": r, "green": g,"blue": b}, in the standard representation.
 
 ### Object Composition
-
-- "type": "composition",
+- "type": "composition".
 - "transformation": Same definition as in the regular objects.
 - "objectList": List with all objects contained in the composition. They are listed in the same way as if they were
 specified alone in a file.
 
 
+## Use case analysis
+This section aims to analyze how a user would make use of the library. Two important classes defined in this project
+that exemplify this scenario are the "SceneBasic", that makes use of all the library's capabilities to create a scene; 
+the "SceneFromJSON", which aims to translate the implementation of all basic functionalities to .json files;
+and the "Application" class, showing how we can associate a scene with RTMotors and SDL2 and produce a useful result.
 
-\
-\
-\
-These next sections are a work in progress.
+### Context of use
+The user wants to use a Ray Tracing application and library with the specifications described in the [About section](#about).
 
-## Use case analysis (application of the library)
-Basic Scene is the example
-1. context
-2. desired functions and how they test the program
-3. the definition of the interactions
+### Demanded functionalities
+For the application, the user would expect the following functionalities:
+1. Be informed about the status and documentation of the application;
+2. Select the motor that will cast the rays into the scene;
+3. Manage the files that will be used for composing the scene;
+4. Save the rendered image;
+5. Get error messages for when something went wrong with the execution of the application;
+6. See the image being generated.
+
+For the library, the user would expect the following functionalities:
+1. Create a scene object responsible for managing the components rendered in the image;
+2. Define the camera specifications;
+3. Define lights specifications;
+4. Define objects specifications;
+5. Define materials for the objects;
+6. Define textures for the materials.
 
 ## Functional analysis
-1. functional blocks: image rendering, selecting files, decoding files
-2. interactions with the environment (just select the objects)
-3. architecture description
+The following image presents how the functionalities are implemented through functional blocks.
+![Functional diagram](/resources/functionalblocks.png)
+ 
+## Architecture description
+This section will elaborate on the choice of classes and the general structure of the architecture for the project.
 
-## Also
-1. Presentation of each class and reason
-2. modularity, extensibility (Scalability)
-3. interactions between elements
+### Root directory
+1. **Application class:** Presents a practical use of the library. Makes use of all components from the library in order to
+present a coherent use of all it's capabilities.
+2. **main.cpp:** Responsible for creating the application class and the adequate methods for generating the executable.
 
+### /userFiles
+Here is where the user should place the .json files that will be generated in the scene and retrieve the output image.
+
+### /dependencies
+Library folder with all its related dependencies.
+1. **Ray class:** Object with vector structure for creating all rays casted into the scene.
+2. **HitInformation data structure:** Contains data for intersections between rays and objects.
+3. **TileInformation data structure:** Contains data for rendering scene tiles into a SDL surface.
+4. **Camera class:** Contains the methods for casting the rays into the scene and adapting the retrieved HitInformation to
+   the desired screen specifications.
+
+### /dependencies/RTMotors
+1. **RTMotorGeneric class:** Parent class with the methods to be inherited for casting rays into the selected scene and adapt 
+the information for SDL tile rendering, using the TileInformation data structure. This class has a pointer to the scene 
+class, so that it can access all the information necessary for rendering without depending on the Application class.
+Further RTMotors can be developed inheriting from this class.
+2. **RTMotorSimple class:** Implementation of a motor that renders one tile at a time.
+3. **RTMotorThreaded class:** Implementation of a motor that renders multiple tiles at a time using threads.
+
+### /dependencies/scenes
+1. **SceneGeneric class:** Parent class with the methods to be inherited for generating scenes, and a method for verifying 
+if a scene has all the necessary parts necessary for rendering. This class has a pointer to all objects contained in it.
+Further scene types can be developed inheriting from this class.
+2. **SceneBasic class:** An example of a hard-coded scene.
+3. **SceneFormJSON class:** An example of a scene generated from data of .json files.
+
+### /dependencies/light
+1. **LightGeneric class:** Parent class that inherits the method for calculating the light color in an object. Further light
+types can be developed inheriting from this class.
+2. **LightPoint class:** Implementation of a light whose origin is punctual.
+
+### /dependencies/objects
+1. **GeometricalTransformation class:** Specifies the 3D behaviour of objects transformations in the scene.
+2. **ObjectGeneric class:** Parent class that inherits the methods for defining an object, handling 3D and 2D transformations, 
+retrieving colors from the material, handling intersections with itself and the bounding box (using the HitInformation data 
+structure). Further object types can be developed inheriting from this class.
+3. **ObjectSphere class:** 3D sphere implementation.
+4. **ObjectPlane class:** 3D plane implementation.
+5. **ObjectCylinder class:** 3D cylinder implementation.
+6. **ObjectCone class:** 3D cone implementation.
+7. **ObjectCuboid class:** 3D cuboid implementation. This class also defines the bounding box geometry and intersection calculation.
+8. **ObjectComposition class:** Inherited from the generic class, the composition overrides the way that intersections are
+calculated, since the intersection does not happen to its own dimensions, but the dimensions of the objects contained in
+their list of objects. Once their list is of generic objects, a composition can have another composition within itself.
+
+### /dependencies/materials
+1. **MaterialGeneric class:** Parent class that inherits the methods for defining a material, and provides all color 
+calculation methods for the objects. Has a pointer to the used texture to get its diffuse color. Further material types 
+can be developed inheriting from this class.
+2. **MaterialCompleteSimple class:** Material with all the supported color calculations.
+
+### /dependencies/textures
+1. **ColorMap class:** Contains the mathematical base for mapping a linear variable to a color.
+2. **TextureGeneric class:** Parent class that inherits the methods for defining a texture, retrieve its color and handle 2D
+transformations. Further texture types can be developed inheriting from this class.
+3. **TextureFlat class:** Implementation of a texture with one homogenous color.
+4. **TextureChecker class:** Implementation of a texture with two homogenous colors in a checker pattern.
+5. **TextureGradient class:** Implementation of a texture with colors displayed in a gradient pattern defined by a ColorMap.

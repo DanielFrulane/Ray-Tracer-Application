@@ -1,8 +1,6 @@
 #include "SceneBasic.hpp"
 
-// this is a test version for generating a scene and is not used for the final application
-
-#define aspectRatio 1.0
+// this is an example version for generating a scene and is not used for the final application
 
 App::SceneBasic::SceneBasic() {
     generateSceneObjects();
@@ -13,15 +11,16 @@ App::SceneBasic::SceneBasic() {
 App::SceneBasic::~SceneBasic() = default;
 
 void App::SceneBasic::generateSceneObjects() {
+    // camera setup
     m_hasCamera = true;
-
     m_camera.setPosition({0.0,-10.0,-2.0});
     m_camera.setLookAt({0.0,0.0,0.0});
     m_camera.setUp({0.5,0.0,1.0});
     m_camera.setHorizontalSize(0.75);
-    m_camera.setAspectRatio(aspectRatio);
+    m_camera.setAspectRatio(1.0);
     m_camera.updateStatus();
 
+    // materials
     std::shared_ptr<MaterialCompleteSimple> floorMaterial = std::make_shared<MaterialCompleteSimple> (MaterialCompleteSimple());
     floorMaterial -> m_reflectivity = 0.5;
     floorMaterial -> m_shininess = 0.0;
@@ -30,23 +29,23 @@ void App::SceneBasic::generateSceneObjects() {
     floorTexture->setTransformation({0.0,0.0},1.0/8.0,{16.0,16.0});
     floorMaterial->setTexture(floorTexture);
 
-    std::shared_ptr<MaterialCompleteSimple> gradMat = std::make_shared<MaterialCompleteSimple> (MaterialCompleteSimple());
-    gradMat -> m_reflectivity = 0.05;
-    gradMat -> m_shininess = 0.0;
-    gradMat -> m_translucency = 0.0;
-    std::shared_ptr<Textures::TextureGradient> gradTexture = std::make_shared<Textures::TextureGradient> (Textures::TextureGradient());
-    gradTexture -> setStop(0.0, {1.0, 0.75, 0.0});
-    gradTexture -> setStop(0.5, {0.25, 0.25, 0.25});
-    gradTexture -> setStop(1.0, {1.0, 0.0, 0.0});
-    gradMat->setTexture(gradTexture);
+    std::shared_ptr<MaterialCompleteSimple> gradientMaterial = std::make_shared<MaterialCompleteSimple> (MaterialCompleteSimple());
+    gradientMaterial -> m_reflectivity = 0.05;
+    gradientMaterial -> m_shininess = 0.0;
+    gradientMaterial -> m_translucency = 0.0;
+    std::shared_ptr<Textures::TextureGradient> gradientTexture = std::make_shared<Textures::TextureGradient> (Textures::TextureGradient());
+    gradientTexture -> setStop(0.0, {1.0, 0.75, 0.0});
+    gradientTexture -> setStop(0.5, {0.25, 0.25, 0.25});
+    gradientTexture -> setStop(1.0, {1.0, 0.0, 0.0});
+    gradientMaterial->setTexture(gradientTexture);
 
-    std::shared_ptr<MaterialCompleteSimple> whiteDiffuse = std::make_shared<MaterialCompleteSimple> (MaterialCompleteSimple());
-    whiteDiffuse -> m_reflectivity = 0.05;
-    whiteDiffuse -> m_shininess = 0.0;
-    whiteDiffuse -> m_translucency = 0.0;
-    std::shared_ptr<Textures::TextureFlat> whiteDiffuseTexture = std::make_shared<Textures::TextureFlat> (Textures::TextureFlat());
-    whiteDiffuseTexture ->setColor({0.8, 0.8, 0.8});
-    whiteDiffuse->setTexture(whiteDiffuseTexture);
+    std::shared_ptr<MaterialCompleteSimple> whiteMaterial = std::make_shared<MaterialCompleteSimple> (MaterialCompleteSimple());
+    whiteMaterial -> m_reflectivity = 0.05;
+    whiteMaterial -> m_shininess = 0.0;
+    whiteMaterial -> m_translucency = 0.0;
+    std::shared_ptr<Textures::TextureFlat> whiteTexture = std::make_shared<Textures::TextureFlat> (Textures::TextureFlat());
+    whiteTexture ->setColor({0.8, 0.8, 0.8});
+    whiteMaterial->setTexture(whiteTexture);
 
     std::shared_ptr<MaterialCompleteSimple> mirror = std::make_shared<MaterialCompleteSimple> (MaterialCompleteSimple());
     mirror -> m_reflectivity = 0.3;
@@ -65,80 +64,74 @@ void App::SceneBasic::generateSceneObjects() {
     glassTexture ->setColor({0.9, 0.9, 0.5});
     glass->setTexture(glassTexture);
 
-    std::shared_ptr<MaterialCompleteSimple> flatMat = std::make_shared<MaterialCompleteSimple> (MaterialCompleteSimple());
+    std::shared_ptr<MaterialCompleteSimple> flatMaterial = std::make_shared<MaterialCompleteSimple> (MaterialCompleteSimple());
     glass -> m_reflectivity = 0.3;
     glass -> m_shininess = 32.0;
     glass -> m_translucency = 0.75;
     glass -> m_indexOfRefraction = 1.333;
     std::shared_ptr<Textures::TextureFlat> flatTexture = std::make_shared<Textures::TextureFlat> (Textures::TextureFlat());
     flatTexture ->setColor({1.0,0.0,0.0});
-    flatMat->setTexture(flatTexture);
+    flatMaterial->setTexture(flatTexture);
 
-    m_objectsInScene.push_back(std::make_shared<ObjectPlane>(ObjectPlane()));
+    // objects
+    std::shared_ptr<ObjectGeneric> myPlane = std::make_shared<ObjectPlane>(ObjectPlane());
     GeometricalTransformation testMatrixPlane;
     testMatrixPlane.setTransformation({0.0, 0.0, 2.0},{0.0, 0.0, 0.0},{16.0, 16.0, 16.0});
-    m_objectsInScene.at(0) -> setTransformation(testMatrixPlane);
-    m_objectsInScene.at(0) ->setMaterial(floorMaterial);
+    myPlane-> setTransformation(testMatrixPlane);
+    myPlane->setMaterial(floorMaterial);
+    m_objectsInScene.push_back(myPlane);
 
-    m_objectsInScene.push_back(std::make_shared<ObjectCylinder>(ObjectCylinder()));
+    std::shared_ptr<ObjectGeneric> myCylinder = std::make_shared<ObjectCylinder>(ObjectCylinder());
     GeometricalTransformation testMatrix1;
     testMatrix1.setTransformation({0.0, 0.0, -3.0},{1.0/8.0, 1.0/8.0, 1.0/8.0},{1.0, 1.0, 1.0});
-    m_objectsInScene.at(1) -> setTransformation(testMatrix1);
-    m_objectsInScene.at(1) ->setMaterial(whiteDiffuse);
+    myCylinder-> setTransformation(testMatrix1);
+    myCylinder->setMaterial(whiteMaterial);
+    m_objectsInScene.push_back(myCylinder);
 
-    m_objectsInScene.push_back(std::make_shared<ObjectSphere>(ObjectSphere()));
+    std::shared_ptr<ObjectGeneric> myEgg = std::make_shared<ObjectSphere>(ObjectSphere());
     GeometricalTransformation testMatrix2;
     testMatrix2.setTransformation({-2.0, -2.0, -2.0},{0.0, 0.0, 0.0},{2.0, 2.0, 1.0});
-    m_objectsInScene.at(2) -> setTransformation(testMatrix2);
-    m_objectsInScene.at(2) ->setMaterial(mirror);
+    myEgg-> setTransformation(testMatrix2);
+    myEgg->setMaterial(mirror);
+    m_objectsInScene.push_back(myEgg);
 
-    m_objectsInScene.push_back(std::make_shared<ObjectCuboid>(ObjectCuboid()));
+    std::shared_ptr<ObjectGeneric> myCuboid = std::make_shared<ObjectCuboid>(ObjectCuboid());
     GeometricalTransformation testMatrix3;
     testMatrix3.setTransformation({0.0, -6.0, 0.0}, {1.0/8.0, 1.0/8.0, 1.0/8.0}, {2.0, 1.5, 0.5});
-    m_objectsInScene.at(3) -> setTransformation(testMatrix3);
-    m_objectsInScene.at(3) ->setMaterial(gradMat);
+    myCuboid-> setTransformation(testMatrix3);
+    myCuboid->setMaterial(gradientMaterial);
+    m_objectsInScene.push_back(myCuboid);
 
-    m_objectsInScene.push_back(std::make_shared<ObjectSphere>(ObjectSphere()));
+    std::shared_ptr<ObjectGeneric> myGlass = std::make_shared<ObjectSphere>(ObjectSphere());
     GeometricalTransformation testMatrix4;
     testMatrix4.setTransformation({2.0, -6.0, -2.0},{0.0, 0.0, 0.0},{1.5, 1.5, 1.5});
-    m_objectsInScene.at(4) -> setTransformation(testMatrix4);
-    m_objectsInScene.at(4) ->setMaterial(glass);
+    myGlass-> setTransformation(testMatrix4);
+    myGlass->setMaterial(glass);
+    m_objectsInScene.push_back(myGlass);
 
-    m_objectsInScene.push_back(std::make_shared<ObjectCone>(ObjectCone()));
+    std::shared_ptr<ObjectGeneric> myCone = std::make_shared<ObjectCone>(ObjectCone());
     GeometricalTransformation testMatrix9;
     testMatrix9.setTransformation({-2.0, -5.0, 0.0},{0.0, 0.0, 0.0},{1.0, 1.0, 2.0});
-    m_objectsInScene.at(5) -> setTransformation(testMatrix9);
-    m_objectsInScene.at(5) ->setMaterial(flatMat);
+    myCone-> setTransformation(testMatrix9);
+    myCone->setMaterial(flatMaterial);
+    m_objectsInScene.push_back(myCone);
 
-    /*std::shared_ptr<ObjectSphere> mySphere = std::make_shared<ObjectSphere>(ObjectSphere());
-    mySphere->setMaterial(whiteDiffuse);
-    std::shared_ptr<ObjectSphere> mySphere2 = std::make_shared<ObjectSphere>(ObjectSphere());
-    mySphere2->setMaterial(whiteDiffuse);
-    std::shared_ptr<ObjectComposition> composite = std::make_shared<ObjectComposition> (ObjectComposition());
-    GeometricalTransformation testMatrix5, testMatrix6, testMatrix7;
-    testMatrix5.setTransformation({-2.0, -2.0, -2.0},{0.0, 0.0, 0.0},{4.0, 4.0, 4.0});
-    testMatrix6.setTransformation({0.0, 0.0, 0.0},{0.0, 0.0, 0.0},{0.5, 0.5, 0.5});
-    testMatrix7.setTransformation({5.0, 0.0, 0.0},{0.0, 0.0, 0.0},{1.0, 1.0, 1.0});
-    composite -> setTransformation(testMatrix5);
-    mySphere -> setTransformation(testMatrix6);
-    mySphere2 -> setTransformation(testMatrix7);
-    composite -> addObject(mySphere);
-    composite -> addObject(mySphere2);
-    m_objectsInScene.push_back(composite);*/
+    // lights
+    std::shared_ptr<LightPoint> light1 = std::make_shared<LightPoint>(LightPoint());
+    light1->m_position << 5.0,-10.0,-5.0;
+    light1->m_color << 1.0,0.4,0.4;
+    m_lightsInScene.push_back(light1);
 
-    m_lightsInScene.push_back(std::make_shared<LightPoint>(LightPoint()));
-    m_lightsInScene.at(0) -> m_position << 5.0,-10.0,-5.0;
-    m_lightsInScene.at(0) -> m_color << 1.0,0.4,0.4;
+    std::shared_ptr<LightPoint> light2 = std::make_shared<LightPoint>(LightPoint());
+    light2->m_position << -5.0,-10.0,-5.0;
+    light2->m_color << 0.4,1.0,0.4;
+    m_lightsInScene.push_back(light2);
 
-    m_lightsInScene.push_back(std::make_shared<LightPoint>(LightPoint()));
-    m_lightsInScene.at(1) -> m_position << -5.0,-10.0,-5.0;
-    m_lightsInScene.at(1) -> m_color << 0.4,1.0,0.4;
+    std::shared_ptr<LightPoint> light3 = std::make_shared<LightPoint>(LightPoint());
+    light3->m_position << 0.0,-10.0,-5.0;
+    light3->m_color << 0.4,0.4,1.0;
+    m_lightsInScene.push_back(light3);
 
-    m_lightsInScene.push_back(std::make_shared<LightPoint>(LightPoint()));
-    m_lightsInScene.at(2) -> m_position << 0.0,-10.0,-5.0;
-    m_lightsInScene.at(2) -> m_color << 0.4,0.4,1.0;
-
-    //std::cout<<"Objects in composite: "<<composite->m_objects.size()<<std::endl;
     std::cout<<"Objects in scene: "<<m_objectsInScene.size()<<std::endl;
     std::cout<<"Lights in scene: "<<m_lightsInScene.size()<<std::endl;
 }

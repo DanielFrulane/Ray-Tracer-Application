@@ -1,0 +1,18 @@
+{
+    "type": "cone",
+    "transformation": {
+        "translation": {"x": 2.5, "y": -2,"z": 0},
+        "rotation": {"x": 0, "y": 0, "z": 0},
+        "scale": {"x": 1,"y": 1,"z": 2}
+    },
+    "material": {
+        "reflectivity": 0.3,
+        "shininess": 64,
+        "translucency": 0,
+        "indexOfRefraction": 0,
+        "texture": {
+            "type": "flat",
+            "color": {"red":0.8, "green":0.3, "blue":0}
+        }
+    }
+}

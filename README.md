@@ -3,15 +3,16 @@
 ![Example](/resources/example.png)
 
 ## About
-This project aims to present a Ray Tracing library (and a practical Application using it) developed with
-Software Engineering guidelines, as a solution for attending to the following client specifications:
-1. Allow the description of a realistic 3D scene composition, such as lights and simple shapes (spheres, cubes, etc.);
-2. Allow the rendering of a 3D image by using different and extensible motors for casting rays in Ray Tracing methods;
-3. Integrate the functionalities of the library within an Application that allows the specification of the scenes, execution
-of the Ray Tracing motors and the visualizing the result;
-4. Support textures, colors, translucency and reflections in the scene;
-5. Define a file language that allows the positioning of objects and composition of objects within the scene;
-6. Save the rendered image.
+This project aims to present a Ray Tracing library alongside with an example of application, developed with
+Software Engineering guidelines, as a solution for a library that attends the following client specifications:
+1. Allows the description of a realistic 3D scene composition, with components such as lights and simple shapes
+(spheres, cubes, etc.);
+2. Allows the rendering of a 3D image by using different and extensible motors for casting rays with Ray Tracing methods;
+3. Integrates the functionalities of the library within an Application that allows the specification of the scenes, execution
+of the Ray Tracing motors and the visualization of the result;
+4. Supports textures, colors, translucency and reflections in the scene;
+5. Defines a file language that allows the positioning of objects and composition of objects within the scene;
+6. Saves the rendered image.
 
 ## Built With
 This project was fully built in C++ using the following external libraries:
@@ -62,8 +63,8 @@ through it with a reduced influence in the final color of the intersection, simu
 The library allows the free placement of objects in a 3D scene, without needing individual definitions for each placement. 
 To achieve this, transformations between 2D (u,v) and 3D (x,y,z) representations must be applied to properly represent 
 the intended properties of the objects:
-1. Image rendering (3D -> 2D): the objects are defined in a 3D space, but we visualize them in 2D. Therefore, they are
-projected into the 2D screen.
+1. Image rendering (3D -> 2D): the objects are defined in a mathematical 3D space, but we visualize them in 2D. 
+Therefore, they need to be projected into the 2D screen.
 2. Translation, rotation and scale of objects (3D -> 3D): All objects descriptions are unitary defined in the origin
 (that is, with base dimension of 1) and can be translated, rotated and scaled in the scene with a transformation associated
 with the object's instance.
@@ -73,7 +74,7 @@ a transformation to properly calculate its new color values for that position.
 
 ### Object composition and bounding boxes
 Object compositions are a special type of object that is composed of a list of objects (that can also be object compositions).
-They allow the definitions of internal transformations for the objects within it and also a transformation for itself, 
+They allow the definitions of internal transformations for the objects within it, and also a transformation for itself, 
 making it easier to edit the placement of different objects in the scene. This composition is associated with a bounding box
 defined with the "Cuboid" class, and the intersection tests for internal objects are only made if the ray intersects with 
 this bounding box. This behavior reduces the computational processing in general for compositions made of close objects, 
@@ -104,7 +105,7 @@ This is where the camera will be looking at.
 - **"up":** {"x": x, "y": y,"z": z}, where (x,y,z) are the 3D coordinates in the scene represented in floating point notation.
 This is what is perceived as "up".
 - **"zoomOut":** positive float value, where for values > 1 the camera will be zooming out and for values < 1 it will be zooming in.
-- **"ASPECT_RATIO":** positive float value representing the ratio between the width and height of the rendered image.
+- **"aspectRatio":** positive float value representing the ratio between the width and height of the rendered image.
 
 ### Lights
 - **"type":** "light".

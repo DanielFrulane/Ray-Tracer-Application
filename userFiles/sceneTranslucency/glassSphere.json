@@ -1,0 +1,18 @@
+{
+    "type": "sphere",
+    "transformation": {
+        "translation": {"x": 0, "y": 0, "z": 0},
+        "rotation": {"x": 0, "y": 0, "z": 0},
+        "scale": {"x": 2.5,"y": 2.5,"z": 2.5}
+    },
+    "material": {
+        "reflectivity": 0.3,
+        "shininess": 0.3,
+        "translucency": 0.9,
+        "indexOfRefraction": 1.02,
+        "texture": {
+            "type": "flat",
+            "color": {"red":1.0, "green":0.4, "blue":0.4}
+        }
+    }
+}

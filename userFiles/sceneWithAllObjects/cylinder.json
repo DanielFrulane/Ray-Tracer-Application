@@ -1,0 +1,18 @@
+{
+    "type": "cylinder",
+    "transformation": {
+        "translation": {"x": -2, "y": -3,"z": 1},
+        "rotation": {"x": 0.25, "y": 0.25, "z": 0},
+        "scale": {"x": 1,"y": 1,"z": 1}
+    },
+    "material": {
+        "reflectivity": 0.05,
+        "shininess": 0,
+        "translucency": 0,
+        "indexOfRefraction": 0,
+        "texture": {
+            "type": "flat",
+            "color": {"red":0.9, "green":0.5, "blue":0.6}
+        }
+    }
+}

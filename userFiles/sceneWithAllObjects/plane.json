@@ -1,0 +1,33 @@
+{
+    "type": "plane",
+    "transformation": {
+        "translation": {"x": 0, "y": 0,"z": 2},
+        "rotation": {"x": 0, "y": 0, "z": 0.25},
+        "scale": {"x": 5,"y": 5,"z": 5}
+    },
+    "material": {
+        "reflectivity": 0.5,
+        "shininess": 0,
+        "translucency": 0,
+        "indexOfRefraction": 0,
+        "texture": {
+            "type": "gradient",
+            "stops": [{
+                "position": 0,
+                "color": {"red":1, "green":0, "blue":0}
+            },{
+                "position": 0.25,
+                "color": {"red":1, "green":1, "blue":0}
+            },{
+                "position": 0.5,
+                "color": {"red":0, "green":1, "blue":0}
+            },{
+                "position": 0.75,
+                "color": {"red":0, "green":1, "blue":1}
+            },{
+                "position": 1,
+                "color": {"red":0, "green":0, "blue":1}
+            }]
+        }
+    }
+}
